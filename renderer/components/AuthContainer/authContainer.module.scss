@@ -1,0 +1,59 @@
+@use '../../styles/constants/colors';
+
+.authFormBox {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 500px;
+  height: 700px;
+  padding: 40px 80px;
+  color: colors.$NEAR_WHITE;
+  background: rgba(0, 0, 0, 20%);
+  border-radius: 12px;
+  box-shadow: 3px 3px 10px rgba(0, 0, 0, 10%);
+
+  .helloMessage {
+    font-size: 25px;
+    font-weight: 700;
+    text-align: center;
+  }
+}
+
+.authForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin: 30px 0;
+
+  p {
+    margin: 25px 0 8px;
+    font-size: 17px;
+  }
+
+  input {
+    width: 100%;
+    height: 40px;
+    padding: 0 10px;
+    margin-bottom: 5px;
+    font-size: 17px;
+    background: colors.$NEAR_WHITE;
+    border-radius: 8px;
+
+    &[type='submit'] {
+      margin-top: 30px;
+      cursor: pointer;
+    }
+  }
+
+  .errorMessage {
+    margin: 0;
+    font-size: 15px;
+    color: colors.$BLACK;
+  }
+}
+
+.askAuth {
+  display: flex;
+  justify-content: space-evenly;
+  width: 100%;
+}

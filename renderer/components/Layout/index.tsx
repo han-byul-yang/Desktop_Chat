@@ -9,10 +9,10 @@ interface ILayoutProps {
 
 const Layout = ({ children, isLogin }: ILayoutProps) => {
   return isLogin ? (
-    <main className={styles.chatMain}>
+    <div className={styles.chatContainer}>
       <GNB />
-      {children}
-    </main>
+      <main className={styles.chatMain}>{children}</main>
+    </div>
   ) : (
     <main className={styles.authMain}>{children}</main>
   )

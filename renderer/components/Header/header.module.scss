@@ -1,0 +1,11 @@
+@use '../../styles/constants/colors';
+@use '../../styles/constants/measures';
+
+.header {
+  height: measures.$HEADER;
+  padding: 20px;
+  font-size: 22px;
+  font-weight: 700;
+  color: colors.$KEY;
+  border-bottom: 2px solid colors.$KEY;
+}

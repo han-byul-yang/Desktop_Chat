@@ -1,6 +1,8 @@
 @use '../../styles/constants/colors';
+@use '../../styles/constants/measures';
 
 .gnb {
+  width: 280px;
   height: 100%;
   padding: 10px 15px;
   color: colors.$WHITE;
@@ -8,6 +10,7 @@
   background: colors.$KEY;
 
   .mainName {
+    height: measures.$HEADER;
     padding: 20px 0;
     font-size: 25px;
     font-weight: 700;

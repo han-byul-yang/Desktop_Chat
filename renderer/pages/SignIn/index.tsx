@@ -1,8 +1,19 @@
+import { useContext, useEffect } from 'react'
+import { useRouter } from 'next/router'
+
+import { UserStateContext } from 'pages/_app'
 import { signInAuth } from 'services/firebaseService/firebaseAuthService'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 
 const SignIn = () => {
+  const userAuthState = useContext(UserStateContext)
+  const navigate = useRouter()
+
+  useEffect(() => {
+    if (userAuthState) navigate.push('/UserList')
+  }, [navigate, userAuthState])
+
   const handleAuthSubmit = async (email: string, password: string) => {
     try {
       await signInAuth(email, password)

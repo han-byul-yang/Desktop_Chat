@@ -1,0 +1,16 @@
+@use '../../styles/constants/colors';
+
+.userList {
+  padding: 0 10px;
+  margin: 20px 0;
+
+  li {
+    padding: 15px 0;
+    font-size: 20px;
+    border-bottom: 1px solid colors.$GRAY_100;
+
+    &:first-child {
+      border-top: 1px solid colors.$GRAY_100;
+    }
+  }
+}

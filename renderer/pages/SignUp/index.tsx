@@ -1,27 +1,15 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { useRouter } from 'next/router'
-import { FirebaseError } from 'firebase/app'
-import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-
-import { firebaseAuthService } from 'services/firebaseService/firebaseSetting'
+import { createDocsWithSpecificId } from 'services/firebaseService/firebaseDBService'
+import { signUpAuth, updateNickName } from 'services/firebaseService/firebaseAuthService'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 
 const SignUp = () => {
-  const navigate = useRouter()
-
   const handleAuthSubmit = async (nickName: string, email: string, password: string) => {
     try {
-      await createUserWithEmailAndPassword(firebaseAuthService, email, password)
-        .then(() => navigate.push('/UserList'))
-        .catch((error) => {
-          if (error instanceof FirebaseError) throw new Error(error.code)
-        })
-      updateProfile(firebaseAuthService.currentUser, {
-        displayName: nickName,
-      }).catch((error) => {
-        if (error instanceof FirebaseError) throw new Error(error.code)
-      })
+      await signUpAuth(email, password).then((auth) =>
+        createDocsWithSpecificId('userInfo', auth!.user.uid, { uid: auth!.user.uid, email, nickName, chatRoom: [] })
+      )
+      await updateNickName(nickName)
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {

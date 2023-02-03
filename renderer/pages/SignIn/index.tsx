@@ -1,22 +1,11 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { useRouter } from 'next/router'
-import { FirebaseError } from 'firebase/app'
-import { signInWithEmailAndPassword } from 'firebase/auth'
-
-import { firebaseAuthService } from 'services/firebaseService/firebaseSetting'
+import { signInAuth } from 'services/firebaseService/firebaseAuthService'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 
 const SignIn = () => {
-  const navigate = useRouter()
-
   const handleAuthSubmit = async (email: string, password: string) => {
     try {
-      await signInWithEmailAndPassword(firebaseAuthService, email, password)
-        .then(() => navigate.push('/UserList'))
-        .catch((error) => {
-          if (error instanceof FirebaseError) throw new Error(error.code)
-        })
+      await signInAuth(email, password)
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {

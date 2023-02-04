@@ -10,8 +10,10 @@ import {
   getDoc,
   getDocs,
   onSnapshot,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from 'firebase/firestore'
 
 import { IUserInfo } from 'types/dbDocType'
@@ -55,6 +57,23 @@ export const getSpecificDocs = async (collectionName: string, docId: string) => 
   return docs
 }
 
-export const onSnapShotDocs = (collectionName: string, docId: string, handleFunc: Dispatch<any>) => {
-  onSnapshot(doc(firebaseDBService, collectionName, docId), (docData) => handleFunc(docData.data()))
+export const onSnapShotAllCollectionDocs = (collectionName: string, uid: string, handleFunc: Dispatch<any>) => {
+  // eslint-disable-next-line prettier/prettier
+  const q = query(collection(firebaseDBService, collectionName), where("member", "array-contains", uid))
+  const unSubscribe = onSnapshot(q, (docData) => {
+    const myChatRoomsDocs: DocumentData[] = []
+
+    docData.forEach((data) => myChatRoomsDocs.push(data.data()))
+
+    handleFunc(myChatRoomsDocs)
+  })
+  return unSubscribe
+}
+
+// 공통 util로 만들기
+
+export const onSnapShotSpecificDocs = (collectionName: string, docId: string, handleFunc: Dispatch<any>) => {
+  const unSubscribe = onSnapshot(doc(firebaseDBService, collectionName, docId), (docData) => handleFunc(docData.data()))
+
+  return unSubscribe
 }

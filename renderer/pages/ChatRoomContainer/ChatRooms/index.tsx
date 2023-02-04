@@ -4,7 +4,7 @@ import { DocumentData } from 'firebase/firestore'
 import { useSetRecoilState } from 'recoil'
 
 import { MyUidContext } from 'pages/_app'
-import { getSpecificDocs } from 'services/firebaseService/firebaseDBService'
+import { getSpecificDocs, onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
 import { isOpenChatRoomAtom, selectedChatRoomAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 
@@ -16,23 +16,33 @@ interface IChatRoomsProps {
 
 const ChatRooms = () => {
   const myUid = useContext(MyUidContext)
-  const [myChatRoom, setMyChatRoom] = useState<string[]>([])
+  const [userInfoDoc, setUserInfoDoc] = useState<DocumentData | undefined>({})
   const [myChatRoomsInfo, setMyChatRoomsInfo] = useState<(DocumentData | undefined)[]>([])
   const setSelectedChatRoom = useSetRecoilState(selectedChatRoomAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
 
   useEffect(() => {
-    getSpecificDocs('userInfo', myUid).then((docData) => setMyChatRoom(docData.data()?.chatRoom))
+    getSpecificDocs('userInfo', myUid).then((docData) => setUserInfoDoc(docData.data()))
   }, [myUid])
 
   useEffect(() => {
-    const myChatRoomDocs = myChatRoom?.map((room: string) => getSpecificDocs('chatRoomInfo', room))
+    /*   const myChatRoomDocs = userInfoDoc?.chatRoom?.map((room: string) => getSpecificDocs('chatRoomInfo', room))
 
-    Promise.all(myChatRoomDocs).then((docData) => {
-      const docDataList = docData.map((data) => data.data())
-      setMyChatRoomsInfo(docDataList)
-    })
-  }, [myChatRoom])
+    if (myChatRoomDocs)
+      Promise.all(myChatRoomDocs).then((docData) => {
+        const docDataList = docData.map((data) => data.data())
+        setMyChatRoomsInfo(docDataList)
+      }) 
+
+    const snapShot = userInfoDoc?.chatRoom.forEach((room: string) =>
+      onSnapShotDocs('chatRoomInfo', room, setMyChatRoomsInfo)
+    )
+
+    return snapShot */
+    const unsubscribe = onSnapShotAllCollectionDocs('chatRoomInfo', myUid, setMyChatRoomsInfo)
+
+    return unsubscribe
+  }, [myUid])
 
   const handleChatRoomClick = (createId: number) => {
     setSelectedChatRoom(myChatRoomsInfo[createId])

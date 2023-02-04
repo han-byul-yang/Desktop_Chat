@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { ChangeEvent, FormEvent, FormEventHandler, MouseEventHandler, useEffect, useState } from 'react'
+import { ChangeEvent, Dispatch, FormEvent, FormEventHandler, MouseEventHandler, useEffect, useState } from 'react'
 import { DocumentData, DocumentReference, arrayUnion } from 'firebase/firestore'
-import { getAuth } from 'firebase/auth'
+import { Unsubscribe, getAuth } from 'firebase/auth'
 import { useSetRecoilState, useRecoilValue, useRecoilState, useResetRecoilState } from 'recoil'
 
 import {
@@ -9,7 +9,7 @@ import {
   createDocsWithSpecificId,
   getAllCollectionDocs,
   getSpecificDocs,
-  onSnapShotDocs,
+  onSnapShotSpecificDocs,
   updateDocs,
 } from 'services/firebaseService/firebaseDBService'
 import { isOpenChatRoomAtom, myInfoDocAtom, selectedChatRoomAtom, selectedChatterAtom } from 'Store/docInfoAtom'
@@ -52,10 +52,14 @@ const ChatRoom = () => {
   }, [selectedChatter, setSelectedChatRoom, userAuthInfo?.uid])
 
   useEffect(() => {
+    let unSubscribe
+
     if (selectedChatRoom?.messageId) {
       getSpecificDocs('messageInfo', selectedChatRoom.messageId).then((docData) => setMessageInfo(docData.data()))
-      onSnapShotDocs('messageInfo', selectedChatRoom.messageId, setMessageInfo)
+      unSubscribe = onSnapShotSpecificDocs('messageInfo', selectedChatRoom.messageId, setMessageInfo)
     }
+
+    return unSubscribe // onSnapShot 조건 이용하여 if 문 밖으로
   }, [selectedChatRoom?.messageId])
 
   useEffect(() => {
@@ -97,7 +101,7 @@ const ChatRoom = () => {
         messageId: messageRef?.id,
         lastMessage: '',
       })
-      updateDocs('chatRoomInfo', chatRoomRef?.id, { chatRoomId: chatRoomRef?.id })
+      updateDocs('chatRoomInfo', chatRoomRef?.id, { chatRoomId: chatRoomRef?.id, lastMessage: inputMessage })
       const chatRoomMembers = [...selectedChatter.map((chatter) => chatter.uid), userAuthInfo?.uid]
       chatRoomMembers.forEach((uid) => updateDocs('userInfo', uid!, { chatRoom: arrayUnion(chatRoomRef!.id) }))
       getSpecificDocs('chatRoomInfo', chatRoomRef?.id).then((docData) => setSelectedChatRoom(docData.data()))

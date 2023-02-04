@@ -7,11 +7,12 @@ import { useSetRecoilState, useRecoilValue, useRecoilState, useResetRecoilState 
 import {
   createDocsWithAutoId,
   createDocsWithSpecificId,
+  getAllCollectionDocs,
   getSpecificDocs,
   onSnapShotDocs,
   updateDocs,
 } from 'services/firebaseService/firebaseDBService'
-import { isOpenChatRoomAtom, selectedChatRoomAtom, selectedChatterAtom } from 'Store/docInfoAtom'
+import { isOpenChatRoomAtom, myInfoDocAtom, selectedChatRoomAtom, selectedChatterAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 
 import styles from './chatRoom.module.scss'
@@ -27,10 +28,28 @@ const ChatRoom = () => {
   const [selectedChatRoom, setSelectedChatRoom] = useRecoilState(selectedChatRoomAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
   const selectedChatter = useRecoilValue(selectedChatterAtom)
+  const [myInfoDoc, setMyInfoDoc] = useRecoilState(myInfoDocAtom)
   const time = new Date().getTime()
   const resetSelectedChatRoom = useResetRecoilState(selectedChatRoomAtom)
   const resetSelectedChatter = useResetRecoilState(selectedChatterAtom)
   const resetIsOpenChatRoom = useResetRecoilState(isOpenChatRoomAtom)
+
+  useEffect(() => {
+    getAllCollectionDocs('chatRoomInfo').then((docData) => {
+      const filteredChatRoom =
+        selectedChatter[0].uid === userAuthInfo?.uid
+          ? docData.filter((data) => data.member[0] === data.member[1])
+          : docData.filter(
+              (data) =>
+                data.member.length <= 2 &&
+                data.member.includes(selectedChatter[0].uid) &&
+                data.member.includes(userAuthInfo?.uid)
+            )
+      if (filteredChatRoom) {
+        setSelectedChatRoom(filteredChatRoom[0])
+      }
+    })
+  }, [selectedChatter, setSelectedChatRoom, userAuthInfo?.uid])
 
   useEffect(() => {
     if (selectedChatRoom?.messageId) {

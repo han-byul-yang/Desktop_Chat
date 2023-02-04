@@ -7,7 +7,7 @@ import styles from './gnb.module.scss'
 
 const navigationInfo = [
   { title: '유저 목록', path: '/UserList' },
-  { title: '채팅방', path: '/ChattingRoom' },
+  { title: '채팅방', path: '/ChatRoomContainer' },
 ]
 
 const GNB = () => {

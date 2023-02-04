@@ -1,14 +1,15 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { UserStateContext } from 'pages/_app'
+import { AuthStateContext } from 'pages/_app'
 import { createDocsWithSpecificId } from 'services/firebaseService/firebaseDBService'
 import { signUpAuth, updateNickName } from 'services/firebaseService/firebaseAuthService'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 
 const SignUp = () => {
-  const userAuthState = useContext(UserStateContext)
+  const userAuthState = useContext(AuthStateContext)
   const navigate = useRouter()
 
   useEffect(() => {

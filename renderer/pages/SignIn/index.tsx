@@ -1,13 +1,14 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
-import { UserStateContext } from 'pages/_app'
+import { AuthStateContext } from 'pages/_app'
 import { signInAuth } from 'services/firebaseService/firebaseAuthService'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 
 const SignIn = () => {
-  const userAuthState = useContext(UserStateContext)
+  const userAuthState = useContext(AuthStateContext)
   const navigate = useRouter()
 
   useEffect(() => {

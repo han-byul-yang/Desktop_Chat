@@ -1,10 +1,14 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
+import { useRecoilState } from 'recoil'
+import { getAuth } from 'firebase/auth'
 import { DocumentData } from 'firebase/firestore'
 
-import { UserStateContext } from 'pages/_app'
-import { getAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
+import { AuthStateContext } from 'pages/_app'
+import { getAllCollectionDocs, getSpecificDocs } from 'services/firebaseService/firebaseDBService'
 import { IUserInfo } from 'types/dbDocType'
+import { myInfoDocAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 import ProfileBox from 'components/ProfileBox'
 
@@ -12,9 +16,12 @@ import styles from './userList.module.scss'
 
 const UserList = () => {
   const [userInfoDocList, setUserInfoDocList] = useState<DocumentData[]>([])
+  // const [myInfoDoc, setMyInfoDoc] = useState<DocumentData>({})
+  const [myInfoDoc, setMyInfoDoc] = useRecoilState(myInfoDocAtom)
   const [selectedUser, setSelectedUser] = useState(0)
   const [isOpenProfile, setIsOpenProfile] = useState(false)
-  const userAuthState = useContext(UserStateContext)
+  const auth = getAuth()
+  const userAuthState = useContext(AuthStateContext)
   const navigate = useRouter()
 
   useEffect(() => {
@@ -22,8 +29,11 @@ const UserList = () => {
   }, [navigate, userAuthState])
 
   useEffect(() => {
-    getAllCollectionDocs('userInfo').then((docData) => setUserInfoDocList(docData))
-  }, [])
+    getAllCollectionDocs('userInfo').then((docData) => {
+      setMyInfoDoc(docData.filter((userData) => userData.uid === auth.currentUser?.uid)[0])
+      setUserInfoDocList(docData)
+    })
+  }, [auth.currentUser, auth.currentUser?.uid, setMyInfoDoc])
 
   const handleUserClick = (index: number) => {
     setSelectedUser(index)
@@ -47,7 +57,11 @@ const UserList = () => {
         })}
       </ul>
       {isOpenProfile && (
-        <ProfileBox selectedUserInfo={userInfoDocList[selectedUser]} setIsOpenProfile={setIsOpenProfile} />
+        <ProfileBox
+          myInfoDoc={myInfoDoc}
+          selectedUserInfoDoc={userInfoDocList[selectedUser]}
+          setIsOpenProfile={setIsOpenProfile}
+        />
       )}
     </>
   )

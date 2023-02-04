@@ -1,30 +1,41 @@
-import { createContext, useState } from 'react'
+import { createContext, useEffect, useState } from 'react'
 import type { AppProps } from 'next/app'
-import { firebaseAuthService } from 'services/firebaseService/firebaseSetting'
+import { RecoilRoot, useSetRecoilState } from 'recoil'
+import { getAuth } from 'firebase/auth'
 
+import { firebaseAuthService } from 'services/firebaseService/firebaseSetting'
+import { myAuthUidAtom } from 'Store/docInfoAtom'
 import Layout from 'components/Layout'
 
 import '../styles/global.scss'
 
-export const UserStateContext = createContext(false)
+export const AuthStateContext = createContext(false)
+export const MyUidContext = createContext('')
 
 const App = ({ Component, pageProps }: AppProps) => {
-  const [isLogin, setIsLogin] = useState(false)
+  const auth = getAuth()
+  const [isLogin, setIsLogin] = useState(!!auth.currentUser)
+  const [myUid, setMyUid] = useState('')
 
   firebaseAuthService.onAuthStateChanged((state) => {
     if (state) {
       setIsLogin(true)
+      if (auth.currentUser) setMyUid(auth.currentUser.uid)
     } else {
       setIsLogin(false)
     }
   })
 
   return (
-    <UserStateContext.Provider value={isLogin}>
-      <Layout isLogin={isLogin}>
-        <Component {...pageProps} />
-      </Layout>
-    </UserStateContext.Provider>
+    <RecoilRoot>
+      <AuthStateContext.Provider value={isLogin}>
+        <MyUidContext.Provider value={myUid}>
+          <Layout isLogin={isLogin}>
+            <Component {...pageProps} />
+          </Layout>
+        </MyUidContext.Provider>
+      </AuthStateContext.Provider>
+    </RecoilRoot>
   )
 }
 

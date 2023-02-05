@@ -6,9 +6,11 @@ import { DocumentData } from 'firebase/firestore'
 
 import { AuthStateContext, MyUidContext } from 'pages/_app'
 import { getSpecificDocs } from 'services/firebaseService/firebaseDBService'
-import { isOpenChatRoomAtom, selectedChatterAtom } from 'Store/docInfoAtom'
+import useResize from 'hooks/useResize'
+import { isOpenChatRoomAtom, isOpenChooseChattersAtom, selectedChatterAtom } from 'Store/docInfoAtom'
 import ChatRooms from './ChatRooms'
 import ChatRoom from './ChatRoom'
+import ChooseChatters from 'pages/ChooseChatters'
 
 import styles from './chatRoomContainer.module.scss'
 
@@ -18,36 +20,22 @@ const ChatRoomContainer = () => {
   const [profileOpenChatRoom, setProfileOpenChatRoom] = useState<DocumentData>({})
   const isOpenChatRoom = useRecoilValue(isOpenChatRoomAtom)
   const selectedChatter = useRecoilValue(selectedChatterAtom)
+  const isOpenChooseChatters = useRecoilValue(isOpenChooseChattersAtom)
+  const { size, isSize: isDesktop } = useResize()
   const navigate = useRouter()
   const [myChatRoom, setMyChatRoom] = useState<string[]>([])
   const [myChatRoomsInfo, setMyChatRoomsInfo] = useState<(DocumentData | undefined)[]>([])
 
   useEffect(() => {
-    if (!userAuthState) navigate.push('/SignIn')
-  }, [navigate, userAuthState])
-
-  useEffect(() => {
-    getSpecificDocs('userInfo', myUid).then((docData) => setMyChatRoom(docData.data()?.chatRoom))
-  }, [myUid])
-
-  useEffect(() => {
-    const myChatRoomDocs = myChatRoom?.map((room: string) => getSpecificDocs('chatRoomInfo', room))
-    Promise.all(myChatRoomDocs).then((docData) => setMyChatRoomsInfo(docData))
-  }, [myChatRoom])
-
-  useEffect(() => {
-    if (isOpenChatRoom && selectedChatter) {
-      const filteredChatRoom = myChatRoomsInfo.filter((docData) => {
-        return docData?.data()?.member.includes(selectedChatter || myUid)
-      })
-      setProfileOpenChatRoom(filteredChatRoom)
-    }
-  }, [isOpenChatRoom, myChatRoomsInfo, myUid, selectedChatter])
+    size.DESKTOP.RESIZE()
+    size.DESKTOP.SIZEEVENT()
+  }, [size.DESKTOP])
 
   return (
     <div className={styles.chatRoomContainer}>
       <ChatRooms />
       {isOpenChatRoom && <ChatRoom />}
+      {isOpenChooseChatters && <ChooseChatters />}
     </div>
   )
 }

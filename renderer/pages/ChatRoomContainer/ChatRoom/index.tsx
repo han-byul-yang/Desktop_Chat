@@ -1,8 +1,18 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { ChangeEvent, Dispatch, FormEvent, FormEventHandler, MouseEventHandler, useEffect, useState } from 'react'
+import {
+  ChangeEvent,
+  ChangeEventHandler,
+  Dispatch,
+  FormEvent,
+  FormEventHandler,
+  MouseEventHandler,
+  useEffect,
+  useState,
+} from 'react'
 import { DocumentData, DocumentReference, arrayUnion, where } from 'firebase/firestore'
 import { Unsubscribe, getAuth } from 'firebase/auth'
 import { useSetRecoilState, useRecoilValue, useRecoilState, useResetRecoilState } from 'recoil'
+import cx from 'classnames'
 
 import {
   createDocsWithAutoId,
@@ -75,11 +85,13 @@ const ChatRoom = () => {
     }
   }, [resetIsOpenChatRoom, resetIsOpenChooseChatters, resetSelectedChatRoom, resetSelectedChatter])
 
-  const handleInputMessageChange = (e: ChangeEvent<HTMLInputElement>) => {
+  const handleInputMessageChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     setInputMessage(e.currentTarget.value)
   }
 
-  const handleMessageSubmit = async () => {
+  const handleMessageSubmit = async (e: any) => {
+    e.preventDefault()
+    setInputMessage('')
     if (selectedChatRoom?.messageId) {
       await updateDocs('messageInfo', selectedChatRoom.messageId, {
         messages: arrayUnion({
@@ -118,26 +130,46 @@ const ChatRoom = () => {
       <Header title={selectedChatterNickName.join(',') || selectedChatRoom?.title} />
       <div className={styles.chatScreen}>
         <ul>
-          {messageInfo?.messages?.map((message: any, index: number) => {
+          {messageInfo?.messages?.map((message: DocumentData, index: number) => {
             const {
-              sender: { nickName },
+              sender: { nickName, uid },
               text,
               time: sentTime,
             } = message
             const messageInfoKey = `messageInfo-${index}`
+            const myMessage = userAuthInfo?.uid === uid
             return (
               <li key={messageInfoKey} className={styles.messageInfoBox}>
-                <p>{nickName}</p>
-                <p>{text}</p>
-                <p>{sentTime}</p>
+                <div
+                  className={cx(styles.messageBox, {
+                    [styles.myMessageBox]: myMessage,
+                  })}
+                >
+                  <p className={styles.nickName}>{nickName}</p>
+                  <div>
+                    {myMessage ? (
+                      <>
+                        <p className={styles.sentTime}>{sentTime}</p>
+                        <p className={styles.text}>{text}</p>
+                      </>
+                    ) : (
+                      <>
+                        <p className={styles.text}>{text}</p>
+                        <p className={styles.sentTime}>{sentTime}</p>
+                      </>
+                    )}
+                  </div>
+                </div>
               </li>
             )
           })}
         </ul>
-        <input type='text' value={inputMessage} onChange={handleInputMessageChange} />
-        <button type='button' onClick={handleMessageSubmit}>
-          전송
-        </button>
+        <form onSubmit={handleMessageSubmit}>
+          <textarea name='text' value={inputMessage} onChange={handleInputMessageChange} />
+          <button type='button' onClick={handleMessageSubmit}>
+            전송
+          </button>
+        </form>
       </div>
     </div>
   )

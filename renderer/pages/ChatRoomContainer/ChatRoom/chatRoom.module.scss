@@ -1,3 +1,82 @@
+@use '../../../styles/constants/colors';
+
 .chatRoom {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   width: 50%;
+}
+
+.chatScreen {
+  display: flex;
+  flex-direction: column;
+  height: 90%;
+  background: colors.$FAINTKEY;
+
+  form {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-height: 60px;
+    padding: 10px;
+    background: colors.$NEAR_WHITE;
+
+    textarea {
+      width: 100%;
+      padding: 10px 40px 10px 10px;
+      resize: none;
+      background: colors.$FAINTKEY;
+      border: none;
+      border-radius: 10px;
+
+      &::-webkit-scrollbar {
+        display: block;
+      }
+    }
+
+    button {
+      position: absolute;
+      right: 20px;
+      font-weight: 700;
+    }
+  }
+}
+
+.messageInfoBox {
+  position: relative;
+  width: 100%;
+  padding: 10px;
+
+  .messageBox {
+    .nickName {
+      margin-bottom: 8px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    div {
+      display: flex;
+    }
+
+    .text {
+      max-width: 250px;
+      padding: 15px;
+      margin-right: 5px;
+      background: colors.$WHITE;
+      border-radius: 8px 8px 0;
+    }
+
+    .sentTime {
+      align-self: flex-end;
+      font-size: 13px;
+    }
+  }
+}
+
+.myMessageBox {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }

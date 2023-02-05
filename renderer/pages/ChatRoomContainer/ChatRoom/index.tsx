@@ -41,16 +41,18 @@ const ChatRoom = () => {
   const resetIsOpenChatRoom = useResetRecoilState(isOpenChatRoomAtom)
   const resetIsOpenChooseChatters = useResetRecoilState(isOpenChooseChattersAtom)
 
+  const selectedChatterNickName = selectedChatter.map((chatter) => chatter.nickName)
+  const selectedChatterUid = selectedChatter.map((chatter) => chatter.uid)
+
   useEffect(() => {
     // 프로필과 채팅상대선택에서 채팅방 개설시 기존 채팅방 여부 확인
     if (!selectedChatRoom?.messageId) {
-      const selectedChatterIds = selectedChatter.map((chatter) => chatter.uid) // 밑에 중복있음
-      const userAddedChatterUid = [...selectedChatterIds, userAuthInfo?.uid].sort()
+      const userAddedChatterUid = [...selectedChatterUid, userAuthInfo?.uid].sort()
       // eslint-disable-next-line prettier/prettier
       const condition = where('member', "in", [[...userAddedChatterUid]])
       getAllCollectionDocs('chatRoomInfo', condition).then((docData) => setSelectedChatRoom(docData[0]))
     }
-  }, [selectedChatRoom?.messageId, selectedChatter, setSelectedChatRoom, userAuthInfo?.uid])
+  }, [selectedChatRoom?.messageId, selectedChatterUid, setSelectedChatRoom, userAuthInfo?.uid])
 
   useEffect(() => {
     let unSubscribe
@@ -98,8 +100,8 @@ const ChatRoom = () => {
         ],
       })
       const chatRoomRef: void | DocumentReference<any> = await createDocsWithAutoId('chatRoomInfo', {
-        title: selectedChatter.map((chatter) => chatter.nickName),
-        member: [...selectedChatter.map((chatter) => chatter.uid), userAuthInfo?.uid].sort(),
+        title: selectedChatterNickName.join(','),
+        member: [...selectedChatterUid, userAuthInfo?.uid].sort(),
         time,
         messageId: messageRef?.id,
         lastMessage: '',
@@ -113,7 +115,7 @@ const ChatRoom = () => {
 
   return (
     <div className={styles.chatRoom}>
-      <Header title='' />
+      <Header title={selectedChatterNickName.join(',') || selectedChatRoom?.title} />
       <div className={styles.chatScreen}>
         <ul>
           {messageInfo?.messages?.map((message: any, index: number) => {

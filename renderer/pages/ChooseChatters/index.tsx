@@ -57,6 +57,7 @@ const ChooseChatters = () => {
   }
 
   const handleCreateChatRoomClick = () => {
+    if (!selectedUsers.size) return
     selectedUsers.forEach((id) => {
       const numId = Number(id)
       const { uid, nickName } = userInfoDocList[numId]

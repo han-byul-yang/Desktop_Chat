@@ -34,3 +34,8 @@ export const selectedChatRoomAtom = atom<DocumentData | undefined>({
   key: 'selectedChatRoom',
   default: {},
 })
+
+export const isOpenChooseChattersAtom = atom({
+  key: 'isOpenChooseChatters',
+  default: false,
+})

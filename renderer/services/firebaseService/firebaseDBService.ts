@@ -4,6 +4,7 @@ import { FirebaseError } from 'firebase/app'
 import {
   DocumentData,
   QueryDocumentSnapshot,
+  QueryFieldFilterConstraint,
   addDoc,
   collection,
   doc,
@@ -37,10 +38,13 @@ export const updateDocs = async (collectionName: string, docId: string, data: an
   })
 }
 
-export const getAllCollectionDocs = async (collectionName: string) => {
+export const getAllCollectionDocs = async (collectionName: string, condition?: QueryFieldFilterConstraint) => {
   const docsList: DocumentData[] = []
+  const q = condition
+    ? query(collection(firebaseDBService, collectionName), condition)
+    : query(collection(firebaseDBService, collectionName))
 
-  const querySnapshot = await getDocs(collection(firebaseDBService, collectionName))
+  const querySnapshot = await getDocs(q)
   querySnapshot.forEach((docData: QueryDocumentSnapshot<DocumentData>) => {
     docsList.push(docData.data())
   })

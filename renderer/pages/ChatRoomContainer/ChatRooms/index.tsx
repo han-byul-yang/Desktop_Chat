@@ -5,7 +5,7 @@ import { useSetRecoilState } from 'recoil'
 
 import { MyUidContext } from 'pages/_app'
 import { getSpecificDocs, onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
-import { isOpenChatRoomAtom, selectedChatRoomAtom } from 'Store/docInfoAtom'
+import { isOpenChatRoomAtom, isOpenChooseChattersAtom, selectedChatRoomAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 
 import styles from './chatRooms.module.scss'
@@ -20,11 +20,12 @@ const ChatRooms = () => {
   const [myChatRoomsInfo, setMyChatRoomsInfo] = useState<(DocumentData | undefined)[]>([])
   const setSelectedChatRoom = useSetRecoilState(selectedChatRoomAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
+  const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
 
-  useEffect(() => {
+  /* useEffect(() => {
     getSpecificDocs('userInfo', myUid).then((docData) => setUserInfoDoc(docData.data()))
   }, [myUid])
-
+*/
   useEffect(() => {
     /*   const myChatRoomDocs = userInfoDoc?.chatRoom?.map((room: string) => getSpecificDocs('chatRoomInfo', room))
 
@@ -49,9 +50,18 @@ const ChatRooms = () => {
     setIsOpenChatRoom(true)
   }
 
+  const handleChooseChatterClick = () => {
+    setIsOpenChooseChatters(true)
+  }
+
   return (
     <div className={styles.chatRooms}>
-      <Header title='채팅방' />
+      <div className={styles.chatRoomsHeader}>
+        <Header title='채팅방' />
+        <button type='button' onClick={handleChooseChatterClick}>
+          채팅 상대 선택
+        </button>
+      </div>
       <ul>
         {myChatRoomsInfo?.map((room, index) => {
           // const { createId, title, lastMessage } = room.data()

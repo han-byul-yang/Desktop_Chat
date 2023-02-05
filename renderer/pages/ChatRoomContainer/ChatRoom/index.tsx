@@ -12,7 +12,7 @@ import {
   onSnapShotSpecificDocs,
   updateDocs,
 } from 'services/firebaseService/firebaseDBService'
-import organizedTime from 'utils/organizedTime'
+import { checkNewDayStart, firstDay, nightDayTime } from 'utils/organizedTime'
 import manageLineChange from 'utils/manageLineChange'
 import {
   isOpenChatRoomAtom,
@@ -136,26 +136,28 @@ const ChatRoom = () => {
             } = message
             const messageInfoKey = `messageInfo-${index}`
             const myMessage = userAuthInfo?.uid === uid
+            const prevMessagInfo = messageInfo?.messages[index - 1]
+            const newDayStart = !index ? firstDay(sentTime) : checkNewDayStart(prevMessagInfo?.time, sentTime)
+
             return (
               <li key={messageInfoKey} className={styles.messageInfoBox}>
+                {newDayStart && <p className={styles.newDate}>{newDayStart}</p>}
                 <div
                   className={cx(styles.messageBox, {
                     [styles.myMessageBox]: myMessage,
                   })}
                 >
-                  {uid !== messageInfo?.messages[index - 1]?.sender.uid && (
-                    <p className={styles.nickName}>{nickName}</p>
-                  )}
+                  {uid !== prevMessagInfo?.sender.uid && <p className={styles.nickName}>{nickName}</p>}
                   <div>
                     {myMessage ? (
                       <>
-                        <p className={styles.sentTime}>{organizedTime(sentTime)}</p>
+                        <p className={styles.sentTime}>{nightDayTime(sentTime)}</p>
                         <p className={styles.myText}>{manageLineChange(text)}</p>
                       </>
                     ) : (
                       <>
                         <p className={styles.text}>{manageLineChange(text)}</p>
-                        <p className={styles.sentTime}>{organizedTime(sentTime)}</p>
+                        <p className={styles.sentTime}>{nightDayTime(sentTime)}</p>
                       </>
                     )}
                   </div>

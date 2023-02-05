@@ -63,8 +63,21 @@
   position: relative;
   width: 100%;
   padding: 10px;
+  text-align: center;
+
+  .newDate {
+    display: inline-block;
+    padding: 8px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    background: colors.$LIGHTKEY;
+    border-radius: 15px;
+  }
 
   .messageBox {
+    text-align: left;
+
     .nickName {
       margin-bottom: 8px;
       font-size: 18px;

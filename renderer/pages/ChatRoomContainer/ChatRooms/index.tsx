@@ -1,12 +1,17 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { useContext, useEffect, useState } from 'react'
 import { DocumentData } from 'firebase/firestore'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil'
 
 import { MyUidContext } from 'pages/_app'
 import { onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
 import organizedTime from 'utils/organizedTime'
-import { isOpenChatRoomAtom, isOpenChooseChattersAtom, selectedChatRoomAtom } from 'Store/docInfoAtom'
+import {
+  isOpenChatRoomAtom,
+  isOpenChooseChattersAtom,
+  selectedChatRoomAtom,
+  selectedChatterAtom,
+} from 'Store/docInfoAtom'
 import Header from 'components/Header'
 
 import styles from './chatRooms.module.scss'
@@ -22,6 +27,7 @@ const ChatRooms = () => {
   const [selectedChatRoom, setSelectedChatRoom] = useRecoilState(selectedChatRoomAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
+  const resetSelectedChatter = useResetRecoilState(selectedChatterAtom)
 
   useEffect(() => {
     const unsubscribe = onSnapShotAllCollectionDocs('chatRoomInfo', myUid, setMyChatRoomsInfo)
@@ -32,6 +38,7 @@ const ChatRooms = () => {
   const handleChatRoomClick = (createId: number) => {
     setSelectedChatRoom(myChatRoomsInfo[createId])
     setIsOpenChatRoom(true)
+    resetSelectedChatter()
   }
 
   const handleChooseChatterClick = () => {

@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import dayjs from 'dayjs'
 
-const organizedTime = (createAt: string) => {
+const organizedTime = (millisecondes: string) => {
   const nowDate = dayjs()
   const nowDateFormat = dayjs(nowDate.format(), 'YYYY-MM-DDTHH:mm:ss+SSS')
-  const createDate = dayjs(createAt, 'd, DD MM YYYY HH:mm:ss GMT')
+  const createDate = dayjs(millisecondes, 'd, DD MM YYYY HH:mm:ss GMT')
 
   if (createDate.format('YYYY MM DD') !== nowDateFormat.format('YYYY MM DD')) {
     if (nowDateFormat.diff(createDate, 'year')) return createDate.format('YYYY년 MM월 DD일')

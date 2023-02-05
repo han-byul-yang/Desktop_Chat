@@ -46,7 +46,7 @@ const UserList = () => {
       <ul className={styles.userList}>
         <p>내 프로필</p>
         <li>
-          <button type='button'>{myInfoDoc.nickName}</button>
+          <button type='button'>{myInfoDoc?.nickName}</button>
         </li>
         <p>유저 목록</p>
         {userInfoDocList.map((docData, index) => {

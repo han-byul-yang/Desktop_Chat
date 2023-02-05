@@ -1,14 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import {
-  ChangeEvent,
-  ChangeEventHandler,
-  Dispatch,
-  FormEvent,
-  FormEventHandler,
-  MouseEventHandler,
-  useEffect,
-  useState,
-} from 'react'
+import { ChangeEvent, useEffect, useState } from 'react'
 import { DocumentData, DocumentReference, arrayUnion, where } from 'firebase/firestore'
 import { Unsubscribe, getAuth } from 'firebase/auth'
 import { useSetRecoilState, useRecoilValue, useRecoilState, useResetRecoilState } from 'recoil'
@@ -16,12 +7,12 @@ import cx from 'classnames'
 
 import {
   createDocsWithAutoId,
-  createDocsWithSpecificId,
   getAllCollectionDocs,
   getSpecificDocs,
   onSnapShotSpecificDocs,
   updateDocs,
 } from 'services/firebaseService/firebaseDBService'
+import organizedTime from 'utils/organizedTime'
 import {
   isOpenChatRoomAtom,
   isOpenChooseChattersAtom,
@@ -32,10 +23,6 @@ import {
 import Header from 'components/Header'
 
 import styles from './chatRoom.module.scss'
-
-interface IChatRoomProps {
-  selectedChatRooms: DocumentData
-}
 
 const ChatRoom = () => {
   const userAuthInfo = getAuth().currentUser
@@ -145,17 +132,19 @@ const ChatRoom = () => {
                     [styles.myMessageBox]: myMessage,
                   })}
                 >
-                  <p className={styles.nickName}>{nickName}</p>
+                  {uid !== messageInfo?.messages[index - 1]?.sender.uid && (
+                    <p className={styles.nickName}>{nickName}</p>
+                  )}
                   <div>
                     {myMessage ? (
                       <>
-                        <p className={styles.sentTime}>{sentTime}</p>
-                        <p className={styles.text}>{text}</p>
+                        <p className={styles.sentTime}>{organizedTime(sentTime)}</p>
+                        <p className={styles.myText}>{text}</p>
                       </>
                     ) : (
                       <>
                         <p className={styles.text}>{text}</p>
-                        <p className={styles.sentTime}>{sentTime}</p>
+                        <p className={styles.sentTime}>{organizedTime(sentTime)}</p>
                       </>
                     )}
                   </div>

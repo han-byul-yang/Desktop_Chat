@@ -1,7 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import Header from 'components/Header'
+import { useState, useContext, useEffect, ChangeEvent } from 'react'
+import { useRouter } from 'next/router'
+import { getAuth } from 'firebase/auth'
+import { DocumentData, where } from 'firebase/firestore'
+import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil'
 
-import styles from './chooseChatters.module.scss'
+import { AuthStateContext } from 'pages/_app'
+import { getAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
 import {
   isOpenChatRoomAtom,
   isOpenChooseChattersAtom,
@@ -9,13 +14,10 @@ import {
   selectedChatRoomAtom,
   selectedChatterAtom,
 } from 'Store/docInfoAtom'
-import { getAuth } from 'firebase/auth'
-import { DocumentData, where } from 'firebase/firestore'
-import { useRouter } from 'next/router'
-import { AuthStateContext } from 'pages/_app'
-import { useState, useContext, useEffect, ChangeEvent } from 'react'
-import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil'
-import { getAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
+import Header from 'components/Header'
+import HeaderButton from 'components/HeaderButton'
+
+import styles from './chooseChatters.module.scss'
 
 const ChooseChatters = () => {
   const userAuthInfo = getAuth().currentUser
@@ -67,20 +69,22 @@ const ChooseChatters = () => {
 
   return (
     <div className={styles.chooseChatters}>
-      <Header title='채팅 선택 유저 리스트' />
-      <button type='button' onClick={handleCreateChatRoomClick}>
-        방 생성
-      </button>
-      <button type='button' onClick={handleCloseClick}>
-        닫기
-      </button>
+      <Header title='채팅 선택 유저 리스트'>
+        <HeaderButton title='방 생성' handleButtonClick={handleCreateChatRoomClick} />
+        <HeaderButton title='닫기' handleButtonClick={handleCloseClick} />
+      </Header>
+
       <ul className={styles.userList}>
         {userInfoDocList.map((docData, index) => {
           const docDataKey = `docData-${index}`
 
           return (
             <li key={docDataKey}>
-              <label htmlFor={`${index}`}>{docData.nickName}</label>
+              <label className={styles.userNickName} htmlFor={`${index}`}>
+                {docData.nickName}
+              </label>
+              <label className={styles.checkbox} htmlFor={`${index}`} />
+
               <input
                 type='checkbox'
                 id={`${index}`}

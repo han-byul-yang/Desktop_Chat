@@ -21,6 +21,7 @@ import {
   selectedChatterAtom,
 } from 'Store/docInfoAtom'
 import Header from 'components/Header'
+import HeaderButton from 'components/HeaderButton'
 
 import styles from './chatRoom.module.scss'
 
@@ -76,6 +77,10 @@ const ChatRoom = () => {
     setInputMessage(e.currentTarget.value)
   }
 
+  const handleCloseButtonClick = () => {
+    setIsOpenChatRoom(false)
+  }
+
   const handleMessageSubmit = async (e: any) => {
     e.preventDefault()
     setInputMessage('')
@@ -105,8 +110,11 @@ const ChatRoom = () => {
         messageId: messageRef?.id,
         lastMessage: '',
       })
-      updateDocs('chatRoomInfo', chatRoomRef?.id, { chatRoomId: chatRoomRef?.id, lastMessage: inputMessage })
-      const chatRoomMembers = [...selectedChatter.map((chatter) => chatter.uid), userAuthInfo?.uid]
+      updateDocs('chatRoomInfo', chatRoomRef?.id, {
+        chatRoomId: chatRoomRef?.id,
+        lastMessage: inputMessage,
+      })
+      const chatRoomMembers = [...selectedChatterUid, userAuthInfo?.uid]
       chatRoomMembers.forEach((uid) => updateDocs('userInfo', uid!, { chatRoom: arrayUnion(chatRoomRef!.id) }))
       getSpecificDocs('chatRoomInfo', chatRoomRef?.id).then((docData) => setSelectedChatRoom(docData.data()))
     }
@@ -114,7 +122,9 @@ const ChatRoom = () => {
 
   return (
     <div className={styles.chatRoom}>
-      <Header title={selectedChatterNickName.join(',') || selectedChatRoom?.title} />
+      <Header title={selectedChatterNickName.join(',') || selectedChatRoom?.title}>
+        <HeaderButton title='채팅방 닫기' handleButtonClick={handleCloseButtonClick} />
+      </Header>
       <div className={styles.chatBox}>
         <ul className={styles.chatScreen}>
           {messageInfo?.messages?.map((message: DocumentData, index: number) => {

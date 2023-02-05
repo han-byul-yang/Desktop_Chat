@@ -1,0 +1,9 @@
+@use '../../styles/constants/colors';
+
+.headerButton {
+  padding: 6px;
+  margin-left: 10px;
+  color: colors.$NEAR_WHITE;
+  background: colors.$KEY;
+  border-radius: 8px;
+}

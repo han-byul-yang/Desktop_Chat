@@ -13,6 +13,7 @@ import {
   selectedChatterAtom,
 } from 'Store/docInfoAtom'
 import Header from 'components/Header'
+import HeaderButton from 'components/HeaderButton'
 
 import styles from './chatRooms.module.scss'
 
@@ -47,12 +48,9 @@ const ChatRooms = () => {
 
   return (
     <div className={styles.chatRooms}>
-      <div className={styles.chatRoomsHeader}>
-        <Header title='채팅방' />
-        <button type='button' onClick={handleChooseChatterClick}>
-          채팅 상대 선택
-        </button>
-      </div>
+      <Header title='채팅방'>
+        <HeaderButton title='채팅 상태 선택' handleButtonClick={handleChooseChatterClick} />
+      </Header>
       <ul className={styles.chatRoomList}>
         {myChatRoomsInfo?.map((room, index) => {
           // const { createId, title, lastMessage } = room.data()

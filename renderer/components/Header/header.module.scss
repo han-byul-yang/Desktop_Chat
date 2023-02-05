@@ -2,6 +2,7 @@
 @use '../../styles/constants/measures';
 
 .header {
+  position: relative;
   height: measures.$HEADER;
   padding: 20px;
   font-size: 22px;
@@ -9,4 +10,11 @@
   color: colors.$KEY;
   background: colors.$WHITE;
   border-bottom: 2px solid colors.$KEY;
+}
+
+.headerButton {
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
 }

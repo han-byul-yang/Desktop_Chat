@@ -4,7 +4,8 @@ import { DocumentData } from 'firebase/firestore'
 import { useSetRecoilState } from 'recoil'
 
 import { MyUidContext } from 'pages/_app'
-import { getSpecificDocs, onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
+import { onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
+import organizedTime from 'utils/organizedTime'
 import { isOpenChatRoomAtom, isOpenChooseChattersAtom, selectedChatRoomAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 
@@ -22,24 +23,7 @@ const ChatRooms = () => {
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
 
-  /* useEffect(() => {
-    getSpecificDocs('userInfo', myUid).then((docData) => setUserInfoDoc(docData.data()))
-  }, [myUid])
-*/
   useEffect(() => {
-    /*   const myChatRoomDocs = userInfoDoc?.chatRoom?.map((room: string) => getSpecificDocs('chatRoomInfo', room))
-
-    if (myChatRoomDocs)
-      Promise.all(myChatRoomDocs).then((docData) => {
-        const docDataList = docData.map((data) => data.data())
-        setMyChatRoomsInfo(docDataList)
-      }) 
-
-    const snapShot = userInfoDoc?.chatRoom.forEach((room: string) =>
-      onSnapShotDocs('chatRoomInfo', room, setMyChatRoomsInfo)
-    )
-
-    return snapShot */
     const unsubscribe = onSnapShotAllCollectionDocs('chatRoomInfo', myUid, setMyChatRoomsInfo)
 
     return unsubscribe
@@ -68,10 +52,11 @@ const ChatRooms = () => {
           const roomKey = `room-${index}`
 
           return (
-            <li key={roomKey}>
+            <li className={styles.chatRoomItem} key={roomKey}>
               <button type='button' onClick={() => handleChatRoomClick(index)}>
-                <p>{room?.title}</p>
-                <p>{room?.lastMessage}</p>
+                <p className={styles.title}>{room?.title}</p>
+                <p className={styles.time}>{organizedTime(room?.time)}</p>
+                <p className={styles.lastMessage}>{room?.lastMessage}</p>
               </button>
             </li>
           )
@@ -82,3 +67,5 @@ const ChatRooms = () => {
 }
 
 export default ChatRooms
+
+// organizedTime useMemo 사용 여부

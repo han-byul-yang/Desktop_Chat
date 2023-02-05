@@ -5,12 +5,13 @@
   display: flex;
   flex-direction: column;
   width: 50%;
+  height: 100%;
 }
 
 .chatBox {
   display: flex;
   flex-direction: column;
-  height: 90%;
+  height: 100%;
   background: colors.$FAINTKEY;
 
   .chatScreen {

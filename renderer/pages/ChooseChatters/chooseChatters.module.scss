@@ -1,4 +1,5 @@
 @use '../../styles/constants/colors';
+@use '../../styles/mixins/list';
 
 .chooseChatters {
   position: absolute;
@@ -8,4 +9,35 @@
   width: 100%;
   height: 100%;
   background: colors.$WHITE;
+}
+
+.userList {
+  padding: 0 10px;
+  margin: 20px 0;
+
+  li {
+    @include list.userList;
+    display: flex;
+    justify-content: space-evenly;
+
+    .userNickName {
+      width: 100%;
+      padding: 0 10px;
+    }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid colors.$KEY;
+      border-radius: 4px;
+    }
+
+    input[type='checkbox'] {
+      display: none;
+    }
+
+    input[id='0']:checked + label {
+      background: colors.$KEY;
+    }
+  }
 }

@@ -1,0 +1,16 @@
+@use '../../styles/constants/colors';
+
+@mixin userList {
+  padding: 18px 0;
+  font-size: 20px;
+  border-bottom: 1px solid colors.$GRAY_100;
+  transition: 0.2s;
+
+  &:first-child {
+    border-top: 1px solid colors.$GRAY_100;
+  }
+
+  &:hover {
+    background: colors.$GRAY_100;
+  }
+}

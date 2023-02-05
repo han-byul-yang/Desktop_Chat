@@ -1,20 +1,16 @@
 @use '../../styles/constants/colors';
+@use '../../styles/mixins/list';
 
 .userList {
   padding: 0 10px;
   margin: 20px 0;
 
   li {
-    position: relative;
-    padding: 15px 0;
-    border-bottom: 1px solid colors.$GRAY_100;
-
-    &:first-child {
-      border-top: 1px solid colors.$GRAY_100;
-    }
+    @include list.userList;
 
     button {
       width: 100%;
+      padding: 0 10px;
       font-size: 20px;
       text-align: start;
     }

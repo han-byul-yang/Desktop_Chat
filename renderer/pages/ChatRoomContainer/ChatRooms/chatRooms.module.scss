@@ -7,20 +7,6 @@
   height: 100%;
 }
 
-.chatRoomsHeader {
-  position: relative;
-
-  button {
-    position: absolute;
-    top: 15px;
-    right: 30px;
-    padding: 6px;
-    color: colors.$NEAR_WHITE;
-    background: colors.$KEY;
-    border-radius: 8px;
-  }
-}
-
 .chatRoomList {
   height: 100%;
   overflow-x: hidden;
@@ -32,7 +18,7 @@
   }
 
   &::-webkit-scrollbar-thumb {
-    background-color: colors.$GRAY_300;
+    background-color: colors.$GRAY_100;
     border-radius: 8px;
   }
 

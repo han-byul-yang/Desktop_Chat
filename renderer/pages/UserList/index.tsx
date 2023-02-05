@@ -31,7 +31,7 @@ const UserList = () => {
   useEffect(() => {
     getAllCollectionDocs('userInfo').then((docData) => {
       setMyInfoDoc(docData.filter((userData) => userData.uid === auth.currentUser?.uid)[0])
-      setUserInfoDocList(docData)
+      setUserInfoDocList(docData.filter((userData) => userData.uid !== auth.currentUser?.uid))
     })
   }, [auth.currentUser, auth.currentUser?.uid, setMyInfoDoc])
 
@@ -44,6 +44,11 @@ const UserList = () => {
     <>
       <Header title='유저 목록' />
       <ul className={styles.userList}>
+        <p>내 프로필</p>
+        <li>
+          <button type='button'>{myInfoDoc.nickName}</button>
+        </li>
+        <p>유저 목록</p>
         {userInfoDocList.map((docData, index) => {
           const docDataKey = `docData-${index}`
 

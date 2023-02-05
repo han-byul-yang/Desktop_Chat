@@ -13,6 +13,7 @@ import {
   updateDocs,
 } from 'services/firebaseService/firebaseDBService'
 import organizedTime from 'utils/organizedTime'
+import manageLineChange from 'utils/manageLineChange'
 import {
   isOpenChatRoomAtom,
   isOpenChooseChattersAtom,
@@ -149,11 +150,11 @@ const ChatRoom = () => {
                     {myMessage ? (
                       <>
                         <p className={styles.sentTime}>{organizedTime(sentTime)}</p>
-                        <p className={styles.myText}>{text}</p>
+                        <p className={styles.myText}>{manageLineChange(text)}</p>
                       </>
                     ) : (
                       <>
-                        <p className={styles.text}>{text}</p>
+                        <p className={styles.text}>{manageLineChange(text)}</p>
                         <p className={styles.sentTime}>{organizedTime(sentTime)}</p>
                       </>
                     )}

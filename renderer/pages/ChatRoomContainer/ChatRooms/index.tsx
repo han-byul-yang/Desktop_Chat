@@ -53,7 +53,7 @@ const ChatRooms = () => {
           채팅 상대 선택
         </button>
       </div>
-      <ul>
+      <ul className={styles.chatRoomList}>
         {myChatRoomsInfo?.map((room, index) => {
           // const { createId, title, lastMessage } = room.data()
 

@@ -115,8 +115,8 @@ const ChatRoom = () => {
   return (
     <div className={styles.chatRoom}>
       <Header title={selectedChatterNickName.join(',') || selectedChatRoom?.title} />
-      <div className={styles.chatScreen}>
-        <ul>
+      <div className={styles.chatBox}>
+        <ul className={styles.chatScreen}>
           {messageInfo?.messages?.map((message: DocumentData, index: number) => {
             const {
               sender: { nickName, uid },

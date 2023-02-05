@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { useContext, useEffect, useState } from 'react'
 import { DocumentData } from 'firebase/firestore'
-import { useSetRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 
 import { MyUidContext } from 'pages/_app'
 import { onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
@@ -19,7 +19,7 @@ const ChatRooms = () => {
   const myUid = useContext(MyUidContext)
   const [userInfoDoc, setUserInfoDoc] = useState<DocumentData | undefined>({})
   const [myChatRoomsInfo, setMyChatRoomsInfo] = useState<(DocumentData | undefined)[]>([])
-  const setSelectedChatRoom = useSetRecoilState(selectedChatRoomAtom)
+  const [selectedChatRoom, setSelectedChatRoom] = useRecoilState(selectedChatRoomAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
 
@@ -49,10 +49,13 @@ const ChatRooms = () => {
       <ul>
         {myChatRoomsInfo?.map((room, index) => {
           // const { createId, title, lastMessage } = room.data()
-          const roomKey = `room-${index}`
 
           return (
-            <li className={styles.chatRoomItem} key={roomKey}>
+            <li
+              className={styles.chatRoomItem}
+              key={room?.title}
+              style={{ background: selectedChatRoom?.title === room?.title ? '#f4f3f3' : 'white' }}
+            >
               <button type='button' onClick={() => handleChatRoomClick(index)}>
                 <p className={styles.title}>{room?.title}</p>
                 <p className={styles.time}>{organizedTime(room?.time)}</p>

@@ -17,6 +17,7 @@
 
   li {
     @include list.userList;
+    position: relative;
     display: flex;
     justify-content: space-evenly;
 
@@ -33,11 +34,18 @@
     }
 
     input[type='checkbox'] {
-      display: none;
-    }
+      position: absolute;
+      right: 0;
+      width: 20px;
+      height: 20px;
+      border: 2px solid colors.$KEY;
+      border-radius: 4px;
+      appearance: none;
 
-    input[id='0']:checked + label {
-      background: colors.$KEY;
+      &:checked {
+        background: colors.$KEY;
+        background-size: 100% 100%;
+      }
     }
   }
 }

@@ -1,8 +1,8 @@
-import { arrayUnion } from 'firebase/firestore'
+import { DocumentData, arrayUnion } from 'firebase/firestore'
 import { IUserInfoType } from 'types/dbDocType'
 
 export const createChatRoomInfoData = (
-  member: (string | undefined)[],
+  member: DocumentData[],
   time: number,
   messageId: string | undefined,
   lastMessage: string
@@ -33,7 +33,7 @@ export const createMessageInfoData = (
 }
 
 export const createUserInfoData = (uid: string, email: string, nickName: string) => {
-  const userObject: IUserInfoType = {
+  const userObject = {
     uid,
     email,
     nickName,

@@ -17,6 +17,7 @@ import useResetAtom from 'hooks/useResetAtom'
 import { newDayStart, firstDay, dayNightTime } from 'utils/organizedTime'
 import manageLineChange from 'utils/manageLineChange'
 import { createChatRoomInfoData, createMessageInfoData } from 'utils/InfoDataForStore'
+import makeChatRoomTitle from 'utils/makeChatRoomTitle'
 import { isOpenChatRoomAtom, existStoredChatRoomAtom, selectedChattersAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 import HeaderButton from 'components/HeaderButton'
@@ -34,21 +35,20 @@ const ChatRoom = () => {
   const { resetExistStoredChatRoom, resetIsOpenChatRoom, resetIsOpenChooseChatters, resetSelectedChatter } =
     useResetAtom()
 
-  const selectedChatterUids = selectedChatters.map((chatter) => chatter.uid)
   const selectedChatterNickNames = selectedChatters.map((chatter) => chatter.nickName)
-  const organizedAllChatterUids = [...selectedChatterUids, uid].sort()
+  const organizedAllChatters = [...selectedChatters, { uid, nickName: displayName }].sort()
 
   useEffect(() => {
     // 프로필과 채팅상대선택에서 채팅방 개설시 기존 채팅방 여부 확인
     function getIfExistStoredChatRoom() {
       if (!existStoredChatRoom?.messageId) {
         // eslint-disable-next-line prettier/prettier
-      const condition = where('member', "in", [[...organizedAllChatterUids]])
+      const condition = where('member', "in", [[...organizedAllChatters]])
         getAllCollectionDocs('chatRoomInfo', condition).then((docData) => setExistStoredChatRoom(docData[0]))
       }
     }
     getIfExistStoredChatRoom()
-  }, [existStoredChatRoom?.messageId, organizedAllChatterUids, setExistStoredChatRoom])
+  }, [existStoredChatRoom?.messageId, organizedAllChatters, setExistStoredChatRoom])
 
   useEffect(() => {
     // 채팅방 목록에서 채팅방 클릭 시
@@ -92,7 +92,7 @@ const ChatRoom = () => {
       updateDocs('chatRoomInfo', existStoredChatRoom.chatRoomId, { lastMessage: { text: inputMessage, time } })
     } else {
       const messageRef = await createDocsWithAutoId('messageInfo', messageInfoData)
-      const chatRoomInfoData = createChatRoomInfoData(organizedAllChatterUids, time, messageRef?.id, '')
+      const chatRoomInfoData = createChatRoomInfoData(organizedAllChatters, time, messageRef?.id, '')
       const chatRoomRef = await createDocsWithAutoId('chatRoomInfo', chatRoomInfoData)
       updateDocs('chatRoomInfo', chatRoomRef?.id, {
         chatRoomId: chatRoomRef?.id,
@@ -104,7 +104,7 @@ const ChatRoom = () => {
 
   return (
     <div className={styles.chatRoom}>
-      <Header title={selectedChatterNickNames.join(',') || '임시제목임'}>
+      <Header title={selectedChatterNickNames.join(',') || makeChatRoomTitle(existStoredChatRoom?.member, uid)}>
         <HeaderButton title='채팅방 닫기' handleButtonClick={handleCloseButtonClick} />
       </Header>
       <div className={styles.chatBox}>

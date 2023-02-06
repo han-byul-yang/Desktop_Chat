@@ -1,5 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { useContext, useEffect, useRef, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import { DocumentData, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
@@ -7,8 +7,9 @@ import { useRecoilState, useSetRecoilState } from 'recoil'
 
 import { AuthStateContext } from 'pages/_app'
 import useResetAtom from 'hooks/useResetAtom'
-import { getSpecificDocs, onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
+import { onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
 import { organizedTime } from 'utils/organizedTime'
+import makeChatRoomTitle from 'utils/makeChatRoomTitle'
 import { isOpenChatRoomAtom, isOpenChooseChattersAtom, existStoredChatRoomAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 import HeaderButton from 'components/HeaderButton'
@@ -16,7 +17,7 @@ import HeaderButton from 'components/HeaderButton'
 import styles from './chatRooms.module.scss'
 
 const ChatRooms = () => {
-  const { uid } = getAuth().currentUser ?? {}
+  const { uid, displayName } = getAuth().currentUser ?? {}
   const [myChatRoomsInfoDocs, setMyChatRoomsInfoDocs] = useState<(DocumentData | undefined)[]>([])
   const [sortedChatRooms, setSortedChatRooms] = useState<(DocumentData | undefined)[]>()
   const [existStoredChatRoom, setExistStoredChatRoom] = useRecoilState(existStoredChatRoomAtom)
@@ -25,7 +26,6 @@ const ChatRooms = () => {
   const { resetSelectedChatter } = useResetAtom()
   const userAuthState = useContext(AuthStateContext)
   const navigate = useRouter()
-  const nickNameRef = useRef('')
 
   useEffect(() => {
     if (!userAuthState) navigate.push('/SignIn')
@@ -33,11 +33,11 @@ const ChatRooms = () => {
 
   useEffect(() => {
     // eslint-disable-next-line prettier/prettier
-    const condition = where("member", "array-contains", uid)
+    const condition = where("member", "array-contains", {uid, nickName: displayName})
     const unsubscribe = onSnapShotAllCollectionDocs('chatRoomInfo', condition, setMyChatRoomsInfoDocs)
 
     return unsubscribe
-  }, [uid])
+  }, [displayName, uid])
 
   useEffect(() => {
     const sortChatRoomByTime = () => {
@@ -66,17 +66,22 @@ const ChatRooms = () => {
       </Header>
       <ul className={styles.chatRoomList}>
         {sortedChatRooms?.map((room, index) => {
+          const roomKey = `room-${index}`
           const {
-            title,
             time,
             lastMessage: { text, time: textTime },
             member,
           } = room ?? {}
+          const chatRoomTitle = makeChatRoomTitle(member, uid) || '내 채팅방'
 
           return (
-            <li className={styles.chatRoomItem} key={index} style={{ background: member === '' ? '#f4f3f3' : 'white' }}>
+            <li
+              className={styles.chatRoomItem}
+              key={roomKey}
+              style={{ background: String(time) === 'hello' ? '#f4f3f3' : 'white' }}
+            >
               <button type='button' onClick={() => handleChatRoomClick(index)}>
-                <p className={styles.title}>멤버</p>
+                <p className={styles.title}>{chatRoomTitle}</p>
                 <p className={styles.time}>{organizedTime(textTime)}</p>
                 <p className={styles.lastMessage}>{text}</p>
               </button>

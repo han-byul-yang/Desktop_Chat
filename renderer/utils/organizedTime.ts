@@ -7,7 +7,7 @@ const dateFormat = (millisecondes: string) => {
   return dayjs(millisecondes, 'd, DD MM YYYY HH:mm:ss GMT')
 }
 
-export const nightDayTime = (millisecondes: string) => {
+export const dayNightTime = (millisecondes: string) => {
   const createDate = dateFormat(millisecondes)
 
   if (createDate.hour() > 0 && createDate.hour() < 12) {
@@ -35,12 +35,12 @@ export const organizedTime = (millisecondes: string) => {
     return '어제'
   }
 
-  const sameDayNightDayTime = nightDayTime(millisecondes)
+  const sameDayDayNightTime = dayNightTime(millisecondes)
 
-  return sameDayNightDayTime
+  return sameDayDayNightTime
 }
 
-export const checkNewDayStart = (prevMillisecondes: string, millisecondes: string) => {
+export const newDayStart = (prevMillisecondes: string, millisecondes: string) => {
   const prevDate = dateFormat(prevMillisecondes)
   const createDate = dateFormat(millisecondes)
   const day = days[createDate.day()]

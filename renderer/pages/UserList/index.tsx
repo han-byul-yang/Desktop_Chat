@@ -1,26 +1,23 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
-import { useRecoilState } from 'recoil'
 import { getAuth } from 'firebase/auth'
 import { DocumentData } from 'firebase/firestore'
 
 import { AuthStateContext } from 'pages/_app'
-import { getAllCollectionDocs, getSpecificDocs } from 'services/firebaseService/firebaseDBService'
-import { IUserInfo } from 'types/dbDocType'
-import { myInfoDocAtom } from 'Store/docInfoAtom'
+import { getAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
 import Header from 'components/Header'
 import ProfileBox from 'components/ProfileBox'
 
 import styles from './userList.module.scss'
 
 const UserList = () => {
-  const [userInfoDocList, setUserInfoDocList] = useState<DocumentData[]>([])
-  // const [myInfoDoc, setMyInfoDoc] = useState<DocumentData>({})
-  const [myInfoDoc, setMyInfoDoc] = useRecoilState(myInfoDocAtom)
+  const [userInfoDocs, setUserInfoDocs] = useState<DocumentData[]>([])
   const [selectedUser, setSelectedUser] = useState(0)
   const [isOpenProfile, setIsOpenProfile] = useState(false)
-  const auth = getAuth()
+  const myUid = getAuth().currentUser?.uid
+  const myInfoDoc = useRef<DocumentData>({})
+  const othersInfoDoc = useRef<DocumentData[]>([])
   const userAuthState = useContext(AuthStateContext)
   const navigate = useRouter()
 
@@ -30,10 +27,11 @@ const UserList = () => {
 
   useEffect(() => {
     getAllCollectionDocs('userInfo').then((docData) => {
-      setMyInfoDoc(docData.filter((userData) => userData.uid === auth.currentUser?.uid)[0])
-      setUserInfoDocList(docData.filter((userData) => userData.uid !== auth.currentUser?.uid))
+      myInfoDoc.current = docData.filter((userData) => userData.uid === myUid)[0]
+      othersInfoDoc.current = docData.filter((userData) => userData.uid !== myUid)
+      setUserInfoDocs([myInfoDoc.current, ...othersInfoDoc.current])
     })
-  }, [auth.currentUser, auth.currentUser?.uid, setMyInfoDoc])
+  }, [myUid, myInfoDoc])
 
   const handleUserClick = (index: number) => {
     setSelectedUser(index)
@@ -46,15 +44,17 @@ const UserList = () => {
       <ul className={styles.userList}>
         <p>내 프로필</p>
         <li>
-          <button type='button'>{myInfoDoc?.nickName}</button>
+          <button type='button' onClick={() => handleUserClick(0)}>
+            {userInfoDocs[0]?.nickName}
+          </button>
         </li>
         <p>유저 목록</p>
-        {userInfoDocList.map((docData, index) => {
+        {othersInfoDoc.current?.map((docData, index) => {
           const docDataKey = `docData-${index}`
 
           return (
             <li key={docDataKey}>
-              <button type='button' onClick={() => handleUserClick(index)}>
+              <button type='button' onClick={() => handleUserClick(index + 1)}>
                 {docData.nickName}
               </button>
             </li>
@@ -62,11 +62,7 @@ const UserList = () => {
         })}
       </ul>
       {isOpenProfile && (
-        <ProfileBox
-          myInfoDoc={myInfoDoc}
-          selectedUserInfoDoc={userInfoDocList[selectedUser]}
-          setIsOpenProfile={setIsOpenProfile}
-        />
+        <ProfileBox selectedUserInfoDoc={userInfoDocs[selectedUser]} setIsOpenProfile={setIsOpenProfile} />
       )}
     </>
   )

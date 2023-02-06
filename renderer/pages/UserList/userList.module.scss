@@ -5,6 +5,12 @@
   padding: 0 10px;
   margin: 20px 0;
 
+  p {
+    padding: 10px 0;
+    font-size: 17px;
+    border-bottom: 1px solid colors.$GRAY_300;
+  }
+
   li {
     @include list.userList;
 

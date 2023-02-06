@@ -1,16 +1,15 @@
-import { createContext, useEffect, useState } from 'react'
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { createContext, useState } from 'react'
 import type { AppProps } from 'next/app'
 import { RecoilRoot, useSetRecoilState } from 'recoil'
 import { getAuth } from 'firebase/auth'
 
 import { firebaseAuthService } from 'services/firebaseService/firebaseSetting'
-import { myAuthUidAtom } from 'Store/docInfoAtom'
 import Layout from 'components/Layout'
 
 import '../styles/global.scss'
 
 export const AuthStateContext = createContext(false)
-export const MyUidContext = createContext('')
 
 const App = ({ Component, pageProps }: AppProps) => {
   const auth = getAuth()
@@ -19,9 +18,11 @@ const App = ({ Component, pageProps }: AppProps) => {
 
   firebaseAuthService.onAuthStateChanged((state) => {
     if (state) {
+      console.log('state', state)
       setIsLogin(true)
       if (auth.currentUser) setMyUid(auth.currentUser.uid)
     } else {
+      console.log('noState', state)
       setIsLogin(false)
     }
   })
@@ -29,11 +30,9 @@ const App = ({ Component, pageProps }: AppProps) => {
   return (
     <RecoilRoot>
       <AuthStateContext.Provider value={isLogin}>
-        <MyUidContext.Provider value={myUid}>
-          <Layout isLogin={isLogin}>
-            <Component {...pageProps} />
-          </Layout>
-        </MyUidContext.Provider>
+        <Layout isLogin={isLogin}>
+          <Component {...pageProps} />
+        </Layout>
       </AuthStateContext.Provider>
     </RecoilRoot>
   )

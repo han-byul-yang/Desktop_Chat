@@ -2,6 +2,8 @@
 @use '../../styles/constants/measures';
 
 .gnb {
+  display: flex;
+  flex-direction: column;
   width: 280px;
   height: 100%;
   padding: 10px 15px;
@@ -18,29 +20,35 @@
   }
 
   ul {
+    height: 100%;
     margin: 80px 0 0;
 
     li {
-      padding: 20px 50px;
+      width: 100%;
+      padding: 20px 0;
       margin-bottom: 40px;
       font-size: 20px;
       border-radius: 12px;
-      transition: 0.2s;
-
-      &:hover {
-        color: colors.$KEY;
-        cursor: pointer;
-        background: colors.$NEAR_WHITE;
-      }
     }
   }
 }
 
 .link {
+  display: block;
+  width: 100%;
+  padding: 20px 0;
   color: colors.$NEAR_WHITE;
+  border-radius: 8px;
+  transition: 0.2s;
+
+  &:hover {
+    color: colors.$KEY;
+    background: colors.$NEAR_WHITE;
+  }
 }
 
 .activeLink {
+  display: block;
   color: colors.$KEY;
   background: colors.$NEAR_WHITE;
 }

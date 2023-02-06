@@ -3,6 +3,7 @@ import { useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import { AuthStateContext } from 'pages/_app'
+import { createUserInfoData } from 'utils/InfoDataForStore'
 import { createDocsWithSpecificId } from 'services/firebaseService/firebaseDBService'
 import { signUpAuth, updateNickName } from 'services/firebaseService/firebaseAuthService'
 import { errorMessages } from 'constants/errorMessages'
@@ -16,11 +17,12 @@ const SignUp = () => {
     if (userAuthState) navigate.push('/UserList')
   }, [navigate, userAuthState])
 
-  const handleAuthSubmit = async (nickName: string, email: string, password: string) => {
+  const handleAuthSubmit = async (email: string, password: string, nickName: string) => {
     try {
-      await signUpAuth(email, password).then((auth) =>
-        createDocsWithSpecificId('userInfo', auth!.user.uid, { uid: auth!.user.uid, email, nickName, chatRoom: [] })
-      )
+      await signUpAuth(email, password).then((auth) => {
+        const userInfoData = createUserInfoData(auth!.user.uid, email, nickName)
+        createDocsWithSpecificId('userInfo', auth!.user.uid, userInfoData)
+      })
       await updateNickName(nickName)
     } catch (error) {
       if (error instanceof Error) {

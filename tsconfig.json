@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "renderer",
     "target": "es5",
     "lib": [
       "dom",
@@ -19,6 +20,7 @@
     "isolatedModules": true,
     "jsx": "preserve"
   },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": [
     "node_modules",
     "renderer/next.config.js",

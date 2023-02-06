@@ -1,46 +1,33 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { useState, useContext, useEffect, ChangeEvent } from 'react'
-import { useRouter } from 'next/router'
+import { useState, useEffect, ChangeEvent } from 'react'
 import { getAuth } from 'firebase/auth'
 import { DocumentData, where } from 'firebase/firestore'
-import { useRecoilState, useResetRecoilState, useSetRecoilState } from 'recoil'
+import { useRecoilState, useSetRecoilState } from 'recoil'
 
-import { AuthStateContext } from 'pages/_app'
 import { getAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
-import {
-  isOpenChatRoomAtom,
-  isOpenChooseChattersAtom,
-  myInfoDocAtom,
-  selectedChatRoomAtom,
-  selectedChatterAtom,
-} from 'Store/docInfoAtom'
+import useResetAtom from 'hooks/useResetAtom'
+import { isOpenChatRoomAtom, isOpenChooseChattersAtom, selectedChattersAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 import HeaderButton from 'components/HeaderButton'
 
 import styles from './chooseChatters.module.scss'
 
 const ChooseChatters = () => {
-  const userAuthInfo = getAuth().currentUser
+  const myUid = getAuth().currentUser?.uid
   const selectedUsers = new Set()
-  const [userInfoDocList, setUserInfoDocList] = useState<DocumentData[]>([])
-  // const [myInfoDoc, setMyInfoDoc] = useState<DocumentData>({})
-  const [myInfoDoc, setMyInfoDoc] = useRecoilState(myInfoDocAtom)
-  const [selectedUser, setSelectedUser] = useState(0)
-  const userAuthState = useContext(AuthStateContext)
-  const navigate = useRouter()
+  const [othersInfoDocList, setOthersInfoDocList] = useState<DocumentData[]>([])
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
-  const [selectedChatter, setSelectedChatter] = useRecoilState(selectedChatterAtom)
-  const resetSelectedChatRoom = useResetRecoilState(selectedChatRoomAtom)
-  const resetSelectedChatter = useResetRecoilState(selectedChatterAtom)
+  const [selectedChatters, setSelectedChatters] = useRecoilState(selectedChattersAtom)
+  const { resetSelectedChatter, resetExistStoredChatRoom } = useResetAtom()
 
   useEffect(() => {
     // eslint-disable-next-line prettier/prettier
-    const condition = where('uid', "!=", userAuthInfo?.uid)
+    const condition = where('uid', "!=", myUid)
     getAllCollectionDocs('userInfo', condition).then((docData) => {
-      setUserInfoDocList(docData)
+      setOthersInfoDocList(docData)
     })
-  }, [userAuthInfo?.uid])
+  }, [myUid])
 
   useEffect(() => {
     resetSelectedChatter()
@@ -60,10 +47,10 @@ const ChooseChatters = () => {
     if (!selectedUsers.size) return
     selectedUsers.forEach((id) => {
       const numId = Number(id)
-      const { uid, nickName } = userInfoDocList[numId]
-      setSelectedChatter((prevState) => (!prevState[0].uid ? [{ uid, nickName }] : [...prevState, { uid, nickName }]))
+      const { uid, nickName } = othersInfoDocList[numId]
+      setSelectedChatters((prevState) => (!prevState[0].uid ? [{ uid, nickName }] : [...prevState, { uid, nickName }]))
     })
-    resetSelectedChatRoom()
+    resetExistStoredChatRoom()
     setIsOpenChooseChatters(false)
     setIsOpenChatRoom(true)
   }
@@ -76,7 +63,7 @@ const ChooseChatters = () => {
       </Header>
 
       <ul className={styles.userList}>
-        {userInfoDocList.map((docData, index) => {
+        {othersInfoDocList.map((docData, index) => {
           const docDataKey = `docData-${index}`
 
           return (

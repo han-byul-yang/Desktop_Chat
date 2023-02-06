@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-extraneous-dependencies */
 import { ChangeEvent, useEffect, useState } from 'react'
-import { DocumentData, where } from 'firebase/firestore'
+import { DocumentData, arrayUnion, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil'
 import cx from 'classnames'
@@ -31,7 +31,6 @@ const ChatRoom = () => {
   const selectedChatters = useRecoilValue(selectedChattersAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
   const time = new Date().getTime()
-  const [chatRoomId, setChatRoomId] = useState('')
   const { resetExistStoredChatRoom, resetIsOpenChatRoom, resetIsOpenChooseChatters, resetSelectedChatter } =
     useResetAtom()
 
@@ -85,22 +84,21 @@ const ChatRoom = () => {
   }
 
   const handleMessageSubmit = async (e: any) => {
-    e.preventDefault()
     setInputMessage('')
     const messageInfoData = createMessageInfoData(inputMessage, displayName, uid, time)
 
     if (existStoredChatRoom?.messageId) {
       await updateDocs('messageInfo', existStoredChatRoom.messageId, messageInfoData)
-      updateDocs('chatRoomInfo', existStoredChatRoom.chatRoomId, { lastMessage: inputMessage })
+      updateDocs('chatRoomInfo', existStoredChatRoom.chatRoomId, { lastMessage: { text: inputMessage, time } })
     } else {
       const messageRef = await createDocsWithAutoId('messageInfo', messageInfoData)
       const chatRoomInfoData = createChatRoomInfoData(organizedAllChatterUids, time, messageRef?.id, '')
-      await createDocsWithAutoId('chatRoomInfo', chatRoomInfoData).then((docData) => setChatRoomId(docData?.id!))
-      updateDocs('chatRoomInfo', chatRoomId, {
-        chatRoomId,
-        lastMessage: inputMessage,
+      const chatRoomRef = await createDocsWithAutoId('chatRoomInfo', chatRoomInfoData)
+      updateDocs('chatRoomInfo', chatRoomRef?.id, {
+        chatRoomId: chatRoomRef?.id,
+        lastMessage: { text: inputMessage, time },
       })
-      getSpecificDocs('chatRoomInfo', chatRoomId).then((docData) => setExistStoredChatRoom(docData.data()))
+      getSpecificDocs('chatRoomInfo', chatRoomRef?.id).then((docData) => setExistStoredChatRoom(docData.data()))
     }
   }
 

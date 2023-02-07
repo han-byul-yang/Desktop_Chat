@@ -1,11 +1,12 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { useContext, useEffect } from 'react'
+import { ReactElement, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import { AuthStateContext } from 'pages/_app'
 import { signInAuth } from 'services/firebaseService/firebaseAuthService'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
+import AuthLayout from 'components/Layout/AuthLayout'
 
 const SignIn = () => {
   const userAuthState = useContext(AuthStateContext)
@@ -16,8 +17,27 @@ const SignIn = () => {
   }, [navigate, userAuthState])
 
   const handleAuthSubmit = async (email: string, password: string) => {
+    const postUserToken = async (userToken: Promise<string>) => {
+      const url = '/api/auth'
+      const userTokenData = await userToken
+      // const url = process.env.NEXT_PUBLIC_BASE_API_URL + path
+      const data = { userTokenData }
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      })
+      return response.json()
+    }
+
     try {
-      await signInAuth(email, password)
+      await signInAuth(email, password).then((response) => {
+        if (response && response.user) {
+          postUserToken(response.user.getIdToken())
+        }
+      })
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {
@@ -38,6 +58,10 @@ const SignIn = () => {
   }
 
   return <AuthContainer type='signIn' handleAuthSubmit={handleAuthSubmit} />
+}
+
+SignIn.getLayout = (page: ReactElement) => {
+  return <AuthLayout>{page}</AuthLayout>
 }
 
 export default SignIn

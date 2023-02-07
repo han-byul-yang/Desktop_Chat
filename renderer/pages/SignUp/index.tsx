@@ -1,13 +1,14 @@
 /* eslint-disable import/no-extraneous-dependencies */
-import { useContext, useEffect } from 'react'
+import { ReactElement, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
 
 import { AuthStateContext } from 'pages/_app'
-import { createUserInfoData } from 'utils/InfoDataForStore'
 import { createDocsWithSpecificId } from 'services/firebaseService/firebaseDBService'
 import { signUpAuth, updateNickName } from 'services/firebaseService/firebaseAuthService'
+import { createUserInfoData } from 'utils/InfoDataForStore'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
+import AuthLayout from 'components/Layout/AuthLayout'
 
 const SignUp = () => {
   const userAuthState = useContext(AuthStateContext)
@@ -17,11 +18,11 @@ const SignUp = () => {
     if (userAuthState) navigate.push('/UserList')
   }, [navigate, userAuthState])
 
-  const handleAuthSubmit = async (email: string, password: string, nickName: string) => {
+  const handleAuthSubmit = async (nickName: string, email: string, password: string) => {
     try {
       await signUpAuth(email, password).then((auth) => {
         const userInfoData = createUserInfoData(auth!.user.uid, email, nickName)
-        createDocsWithSpecificId('userInfo', auth!.user.uid, userInfoData)
+        createDocsWithSpecificId('userInfo', auth!.user.uid, { uid: auth!.user.uid, email, nickName })
       })
       await updateNickName(nickName)
     } catch (error) {
@@ -39,6 +40,10 @@ const SignUp = () => {
   }
 
   return <AuthContainer type='signUp' handleAuthSubmit={handleAuthSubmit} />
+}
+
+SignUp.getLayout = (page: ReactElement) => {
+  return <AuthLayout>{page}</AuthLayout>
 }
 
 export default SignUp

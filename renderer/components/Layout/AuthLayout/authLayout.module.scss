@@ -1,0 +1,11 @@
+@use '../../../styles/constants/colors';
+
+.authLayout {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100vh;
+  padding: 30px;
+  background: colors.$KEY;
+}

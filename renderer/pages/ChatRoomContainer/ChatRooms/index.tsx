@@ -20,7 +20,7 @@ import styles from './chatRooms.module.scss'
 const ChatRooms = () => {
   const { uid, displayName } = getAuth().currentUser ?? {}
   const [myChatRoomsInfoDocs, setMyChatRoomsInfoDocs] = useState<(DocumentData | undefined)[]>([])
-  const [sortedChatRooms, setSortedChatRooms] = useState<(DocumentData | undefined)[]>()
+  const [sortedMyChatRooms, setSortedMyChatRooms] = useState<(DocumentData | undefined)[]>()
   const [existStoredChatRoom, setExistStoredChatRoom] = useRecoilState(existStoredChatRoomAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
@@ -42,7 +42,7 @@ const ChatRooms = () => {
 
   useEffect(() => {
     const mySortedChatRooms = sortChatRoomsByTime(myChatRoomsInfoDocs)
-    setSortedChatRooms(mySortedChatRooms)
+    setSortedMyChatRooms(mySortedChatRooms)
   }, [myChatRoomsInfoDocs])
 
   const handleChatRoomClick = (index: number) => {
@@ -61,10 +61,9 @@ const ChatRooms = () => {
         <HeaderButton title='채팅 상대 선택' handleButtonClick={handleOpenChooseChatterClick} />
       </Header>
       <ul className={styles.chatRoomList}>
-        {sortedChatRooms?.map((room, index) => {
-          const roomKey = `room-${index}`
+        {sortedMyChatRooms?.map((room, index) => {
           const {
-            time,
+            chatRoomId,
             lastMessage: { text, time: textTime },
             member,
           } = room ?? {}
@@ -73,8 +72,10 @@ const ChatRooms = () => {
           return (
             <li
               className={styles.chatRoomItem}
-              key={roomKey}
-              style={{ background: String(time) === 'hello' ? '#f4f3f3' : 'white' }}
+              key={chatRoomId}
+              style={{
+                background: chatRoomId === existStoredChatRoom?.chatRoomId ? '#f4f3f3' : 'white',
+              }}
             >
               <button type='button' onClick={() => handleChatRoomClick(index)}>
                 <p className={styles.title}>{chatRoomTitle}</p>

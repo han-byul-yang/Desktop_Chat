@@ -8,7 +8,7 @@ export const createChatRoomInfoData = (
   lastMessage: string
 ) => {
   const chatRoomObject = {
-    member: member.sort(),
+    member,
     time,
     messageId,
     lastMessage,

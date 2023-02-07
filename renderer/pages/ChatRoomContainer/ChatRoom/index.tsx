@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-extraneous-dependencies */
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useMemo, useState } from 'react'
 import { DocumentData, arrayUnion, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil'
@@ -14,6 +14,7 @@ import {
   updateDocs,
 } from 'services/firebaseService/firebaseDBService'
 import useResetAtom from 'hooks/useResetAtom'
+import { sortChattersByNickName } from 'utils/sortInfoList'
 import { newDayStart, firstDay, dayNightTime } from 'utils/organizedTime'
 import manageLineChange from 'utils/manageLineChange'
 import { createChatRoomInfoData, createMessageInfoData } from 'utils/InfoDataForStore'
@@ -36,19 +37,19 @@ const ChatRoom = () => {
     useResetAtom()
 
   const selectedChatterNickNames = selectedChatters.map((chatter) => chatter.nickName)
-  const organizedAllChatters = [...selectedChatters, { uid, nickName: displayName }].sort()
+  const allChatters = sortChattersByNickName([...selectedChatters, { uid, nickName: displayName }])
 
   useEffect(() => {
     // 프로필과 채팅상대선택에서 채팅방 개설시 기존 채팅방 여부 확인
     function getIfExistStoredChatRoom() {
       if (!existStoredChatRoom?.messageId) {
         // eslint-disable-next-line prettier/prettier
-      const condition = where('member', "in", [[...organizedAllChatters]])
+      const condition = where('member', "in", [[...allChatters]])
         getAllCollectionDocs('chatRoomInfo', condition).then((docData) => setExistStoredChatRoom(docData[0]))
       }
     }
     getIfExistStoredChatRoom()
-  }, [existStoredChatRoom?.messageId, organizedAllChatters, setExistStoredChatRoom])
+  }, [allChatters, existStoredChatRoom?.messageId, setExistStoredChatRoom])
 
   useEffect(() => {
     // 채팅방 목록에서 채팅방 클릭 시
@@ -92,7 +93,7 @@ const ChatRoom = () => {
       updateDocs('chatRoomInfo', existStoredChatRoom.chatRoomId, { lastMessage: { text: inputMessage, time } })
     } else {
       const messageRef = await createDocsWithAutoId('messageInfo', messageInfoData)
-      const chatRoomInfoData = createChatRoomInfoData(organizedAllChatters, time, messageRef?.id, '')
+      const chatRoomInfoData = createChatRoomInfoData(allChatters, time, messageRef?.id, '')
       const chatRoomRef = await createDocsWithAutoId('chatRoomInfo', chatRoomInfoData)
       updateDocs('chatRoomInfo', chatRoomRef?.id, {
         chatRoomId: chatRoomRef?.id,
@@ -104,7 +105,9 @@ const ChatRoom = () => {
 
   return (
     <div className={styles.chatRoom}>
-      <Header title={selectedChatterNickNames.join(',') || makeChatRoomTitle(existStoredChatRoom?.member, uid)}>
+      <Header
+        title={selectedChatterNickNames.join(',') || makeChatRoomTitle(existStoredChatRoom?.member, uid) || '내 채팅방'}
+      >
         <HeaderButton title='채팅방 닫기' handleButtonClick={handleCloseButtonClick} />
       </Header>
       <div className={styles.chatBox}>
@@ -128,7 +131,7 @@ const ChatRoom = () => {
                     [styles.myMessageBox]: isMyMessage,
                   })}
                 >
-                  {uid !== prevMessagInfo?.sender.uid && <p className={styles.nickName}>{nickName}</p>}
+                  {senderId !== prevMessagInfo?.sender.uid && <p className={styles.nickName}>{nickName}</p>}
                   <div>
                     {isMyMessage ? (
                       <>

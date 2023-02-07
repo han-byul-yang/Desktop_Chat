@@ -8,6 +8,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil'
 import { AuthStateContext } from 'pages/_app'
 import useResetAtom from 'hooks/useResetAtom'
 import { onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
+import { sortChatRoomsByTime } from 'utils/sortInfoList'
 import { organizedTime } from 'utils/organizedTime'
 import makeChatRoomTitle from 'utils/makeChatRoomTitle'
 import { isOpenChatRoomAtom, isOpenChooseChattersAtom, existStoredChatRoomAtom } from 'Store/docInfoAtom'
@@ -40,13 +41,8 @@ const ChatRooms = () => {
   }, [displayName, uid])
 
   useEffect(() => {
-    const sortChatRoomByTime = () => {
-      const mySortedChatRooms = myChatRoomsInfoDocs.sort(
-        (a, b) => Number(b!.lastMessage.time) - Number(a!.lastMessage.time)
-      )
-      setSortedChatRooms(mySortedChatRooms)
-    }
-    sortChatRoomByTime()
+    const mySortedChatRooms = sortChatRoomsByTime(myChatRoomsInfoDocs)
+    setSortedChatRooms(mySortedChatRooms)
   }, [myChatRoomsInfoDocs])
 
   const handleChatRoomClick = (index: number) => {

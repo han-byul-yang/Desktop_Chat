@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import { DocumentData, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { useRecoilState, useSetRecoilState } from 'recoil'
+import cx from 'classnames'
 
 import { AuthStateContext } from 'pages/_app'
 import useResetAtom from 'hooks/useResetAtom'
@@ -11,6 +12,7 @@ import { onSnapShotAllCollectionDocs } from 'services/firebaseService/firebaseDB
 import { sortChatRoomsByTime } from 'utils/sortInfoList'
 import { organizedTime } from 'utils/organizedTime'
 import makeChatRoomTitle from 'utils/makeChatRoomTitle'
+import cutExceedText from 'utils/cutExceedText'
 import { isOpenChatRoomAtom, isOpenChooseChattersAtom, existStoredChatRoomAtom } from 'Store/docInfoAtom'
 import Header from 'components/Header'
 import HeaderButton from 'components/HeaderButton'
@@ -22,7 +24,7 @@ const ChatRooms = () => {
   const [myChatRoomsInfoDocs, setMyChatRoomsInfoDocs] = useState<(DocumentData | undefined)[]>([])
   const [sortedMyChatRooms, setSortedMyChatRooms] = useState<(DocumentData | undefined)[]>()
   const [existStoredChatRoom, setExistStoredChatRoom] = useRecoilState(existStoredChatRoomAtom)
-  const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
+  const [isOpenChatRoom, setIsOpenChatRoom] = useRecoilState(isOpenChatRoomAtom)
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
   const { resetSelectedChatter } = useResetAtom()
   const userAuthState = useContext(AuthStateContext)
@@ -33,9 +35,12 @@ const ChatRooms = () => {
   }, [navigate, userAuthState])
 
   useEffect(() => {
-    // eslint-disable-next-line prettier/prettier
-    const condition = where("member", "array-contains", {uid, nickName: displayName})
-    const unsubscribe = onSnapShotAllCollectionDocs('chatRoomInfo', condition, setMyChatRoomsInfoDocs)
+    let unsubscribe
+
+    if (uid && displayName) {
+      const condition = where('member', 'array-contains', { uid, nickName: displayName })
+      unsubscribe = onSnapShotAllCollectionDocs('chatRoomInfo', condition, setMyChatRoomsInfoDocs)
+    }
 
     return unsubscribe
   }, [displayName, uid])
@@ -56,12 +61,17 @@ const ChatRooms = () => {
   }
 
   return (
-    <div className={styles.chatRooms}>
+    <div
+      className={cx(styles.chatRooms, {
+        [styles.openChatRoom]: isOpenChatRoom,
+      })}
+    >
       <Header title='채팅방'>
         <HeaderButton title='채팅 상대 선택' handleButtonClick={handleOpenChooseChatterClick} />
       </Header>
       <ul className={styles.chatRoomList}>
         {sortedMyChatRooms?.map((room, index) => {
+          const roomKey = `room-${index}`
           const {
             chatRoomId,
             lastMessage: { text, time: textTime },
@@ -72,15 +82,15 @@ const ChatRooms = () => {
           return (
             <li
               className={styles.chatRoomItem}
-              key={chatRoomId}
+              key={roomKey}
               style={{
                 background: chatRoomId === existStoredChatRoom?.chatRoomId ? '#f4f3f3' : 'white',
               }}
             >
               <button type='button' onClick={() => handleChatRoomClick(index)}>
-                <p className={styles.title}>{chatRoomTitle}</p>
+                <p className={styles.title}>{cutExceedText(chatRoomTitle, 40)}</p>
                 <p className={styles.time}>{organizedTime(textTime)}</p>
-                <p className={styles.lastMessage}>{text}</p>
+                <p className={styles.lastMessage}>{cutExceedText(text)}</p>
               </button>
             </li>
           )

@@ -40,7 +40,6 @@ const ChatRoom = () => {
   const allChatters = sortChattersByNickName([...selectedChatters, { uid, nickName: displayName }])
 
   useEffect(() => {
-    // 프로필과 채팅상대선택에서 채팅방 개설시 기존 채팅방 여부 확인
     function getIfExistStoredChatRoom() {
       if (!existStoredChatRoom?.messageId) {
         // eslint-disable-next-line prettier/prettier
@@ -52,7 +51,6 @@ const ChatRoom = () => {
   }, [allChatters, existStoredChatRoom?.messageId, setExistStoredChatRoom])
 
   useEffect(() => {
-    // 채팅방 목록에서 채팅방 클릭 시
     function getChatMessageInfo() {
       if (existStoredChatRoom?.messageId) {
         getSpecificDocs('messageInfo', existStoredChatRoom.messageId).then((docData) =>
@@ -90,6 +88,11 @@ const ChatRoom = () => {
       handleMessageSubmit()
     }
   }
+
+  useEffect(() => {
+    if (messageInfoDoc)
+      document.querySelector('#scroll')?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' })
+  }, [messageInfoDoc])
 
   const handleMessageSubmit = async (e?: FormEvent<HTMLFormElement>) => {
     e?.preventDefault()
@@ -156,6 +159,7 @@ const ChatRoom = () => {
             </li>
           )
         })}
+        <div id='scroll' />
       </ul>
       <form className={styles.form} onSubmit={handleMessageSubmit}>
         <textarea name='text' value={inputMessage} onChange={handleInputMessageChange} onKeyDown={handleInputKeyDown} />

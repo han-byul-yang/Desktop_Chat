@@ -5,7 +5,6 @@ import { useRouter } from 'next/router'
 import { AuthStateContext } from 'pages/_app'
 import { createDocsWithSpecificId } from 'services/firebaseService/firebaseDBService'
 import { signUpAuth, updateNickName } from 'services/firebaseService/firebaseAuthService'
-import { createUserInfoData } from 'utils/InfoDataForStore'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 import AuthLayout from 'components/Layout/AuthLayout'
@@ -21,7 +20,6 @@ const SignUp = () => {
   const handleAuthSubmit = async (nickName: string, email: string, password: string) => {
     try {
       await signUpAuth(email, password).then((auth) => {
-        const userInfoData = createUserInfoData(auth!.user.uid, email, nickName)
         createDocsWithSpecificId('userInfo', auth!.user.uid, { uid: auth!.user.uid, email, nickName })
       })
       await updateNickName(nickName)

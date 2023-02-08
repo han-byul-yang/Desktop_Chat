@@ -17,8 +17,8 @@ const AuthContainer = ({ type, handleAuthSubmit }: AuthProps) => {
     getValues,
     handleSubmit,
   } = useForm()
-  const { nickName, email, password } = getValues()
-  const emailRegexp = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/
+  const { nickName, email, password, checkPassword } = getValues()
+  const emailRegexp = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/ // w3c email validation
   const onSubmit = type === 'signUp' ? handleAuthSubmit(nickName, email, password) : handleAuthSubmit(email, password)
 
   return (
@@ -68,7 +68,7 @@ const AuthContainer = ({ type, handleAuthSubmit }: AuthProps) => {
               type='password'
               {...register('checkPassword', {
                 required: '필수 입력 항목 입니다.',
-                validate: (value) => value === password,
+                validate: () => checkPassword === password,
               })}
             />
             <ErrorMessage
@@ -85,12 +85,16 @@ const AuthContainer = ({ type, handleAuthSubmit }: AuthProps) => {
       {type === 'signUp' ? (
         <div className={styles.askAuth}>
           <p>계정이 있으신가요?</p>
-          <Link href='/SignIn'>로그인하기</Link>
+          <Link href='/SignIn'>
+            <a>로그인하기</a>
+          </Link>
         </div>
       ) : (
         <div className={styles.askAuth}>
           <p>계정이 없으신가요?</p>
-          <Link href='/SignUp'>회원가입 하기</Link>
+          <Link href='/SignUp'>
+            <a>회원가입 하기</a>
+          </Link>
         </div>
       )}
     </div>

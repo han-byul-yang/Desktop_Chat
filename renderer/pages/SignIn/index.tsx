@@ -18,26 +18,8 @@ const SignIn = () => {
   }, [navigate, userAuthState])
 
   const handleAuthSubmit = async (email: string, password: string) => {
-    const postUserToken = async (userToken: Promise<string>) => {
-      const url = '/api/auth'
-      const userTokenData = await userToken
-      const data = { userTokenData }
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      })
-      return response.json()
-    }
-
     try {
-      await signInAuth(email, password).then((response) => {
-        if (response && response.user) {
-          postUserToken(response.user.getIdToken())
-        }
-      })
+      await signInAuth(email, password)
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {

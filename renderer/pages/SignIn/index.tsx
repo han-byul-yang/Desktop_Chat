@@ -1,6 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ReactElement, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import fetch from 'isomorphic-unfetch'
 
 import { AuthStateContext } from 'pages/_app'
 import { signInAuth } from 'services/firebaseService/firebaseAuthService'
@@ -20,7 +21,6 @@ const SignIn = () => {
     const postUserToken = async (userToken: Promise<string>) => {
       const url = '/api/auth'
       const userTokenData = await userToken
-      // const url = process.env.NEXT_PUBLIC_BASE_API_URL + path
       const data = { userTokenData }
       const response = await fetch(url, {
         method: 'POST',

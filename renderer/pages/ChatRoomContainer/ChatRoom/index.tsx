@@ -1,6 +1,6 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-extraneous-dependencies */
-import { ChangeEvent, useEffect, useMemo, useState } from 'react'
+import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
 import { DocumentData, arrayUnion, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil'
@@ -84,7 +84,15 @@ const ChatRoom = () => {
     setIsOpenChatRoom(false)
   }
 
-  const handleMessageSubmit = async (e: any) => {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLElement>) => {
+    if (!e.shiftKey && e.key === 'Enter') {
+      e.preventDefault()
+      handleMessageSubmit()
+    }
+  }
+
+  const handleMessageSubmit = async (e?: FormEvent<HTMLFormElement>) => {
+    e?.preventDefault()
     setInputMessage('')
     const messageInfoData = createMessageInfoData(inputMessage, displayName, uid, time)
 
@@ -110,53 +118,49 @@ const ChatRoom = () => {
       >
         <HeaderButton title='채팅방 닫기' handleButtonClick={handleCloseButtonClick} />
       </Header>
-      <div className={styles.chatBox}>
-        <ul className={styles.chatScreen}>
-          {messageInfoDoc?.messages?.map((message: DocumentData, index: number) => {
-            const {
-              sender: { nickName, uid: senderId },
-              text,
-              time: sentTime,
-            } = message
-            const messageInfoKey = `messageInfo-${index}`
-            const isMyMessage = senderId === uid
-            const prevMessagInfo = messageInfoDoc?.messages[index - 1]
-            const newDay = !index ? firstDay(sentTime) : newDayStart(prevMessagInfo?.time, sentTime)
+      <ul className={styles.chatScreen}>
+        {messageInfoDoc?.messages?.map((message: DocumentData, index: number) => {
+          const {
+            sender: { nickName, uid: senderId },
+            text,
+            time: sentTime,
+          } = message
+          const messageInfoKey = `messageInfo-${index}`
+          const isMyMessage = senderId === uid
+          const prevMessagInfo = messageInfoDoc?.messages[index - 1]
+          const newDay = !index ? firstDay(sentTime) : newDayStart(prevMessagInfo?.time, sentTime)
 
-            return (
-              <li key={messageInfoKey} className={styles.messageInfoBox}>
-                {newDay && <p className={styles.newDate}>{newDay}</p>}
-                <div
-                  className={cx(styles.messageBox, {
-                    [styles.myMessageBox]: isMyMessage,
-                  })}
-                >
-                  {senderId !== prevMessagInfo?.sender.uid && <p className={styles.nickName}>{nickName}</p>}
-                  <div>
-                    {isMyMessage ? (
-                      <>
-                        <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>
-                        <p className={styles.myText}>{manageLineChange(text)}</p>
-                      </>
-                    ) : (
-                      <>
-                        <p className={styles.text}>{manageLineChange(text)}</p>
-                        <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>
-                      </>
-                    )}
-                  </div>
+          return (
+            <li key={messageInfoKey} className={styles.messageItem}>
+              {newDay && <p className={styles.newDate}>{newDay}</p>}
+              <div
+                className={cx(styles.messageBox, {
+                  [styles.myMessageBox]: isMyMessage,
+                })}
+              >
+                {senderId !== prevMessagInfo?.sender.uid && <p className={styles.nickName}>{nickName}</p>}
+                <div>
+                  {isMyMessage ? (
+                    <>
+                      <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>
+                      <p className={styles.myText}>{manageLineChange(text)}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className={styles.text}>{manageLineChange(text)}</p>
+                      <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>
+                    </>
+                  )}
                 </div>
-              </li>
-            )
-          })}
-        </ul>
-        <form onSubmit={handleMessageSubmit}>
-          <textarea name='text' value={inputMessage} onChange={handleInputMessageChange} />
-          <button type='button' onClick={handleMessageSubmit}>
-            전송
-          </button>
-        </form>
-      </div>
+              </div>
+            </li>
+          )
+        })}
+      </ul>
+      <form className={styles.form} onSubmit={handleMessageSubmit}>
+        <textarea name='text' value={inputMessage} onChange={handleInputMessageChange} onKeyDown={handleInputKeyDown} />
+        <button type='submit'>전송</button>
+      </form>
     </div>
   )
 }

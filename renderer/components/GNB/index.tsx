@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 /* eslint-disable import/no-extraneous-dependencies */
 import { useRouter } from 'next/router'
 import Link from 'next/link'

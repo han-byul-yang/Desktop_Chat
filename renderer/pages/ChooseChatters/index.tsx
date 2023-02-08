@@ -2,7 +2,7 @@
 import { useState, useEffect, ChangeEvent } from 'react'
 import { getAuth } from 'firebase/auth'
 import { DocumentData, where } from 'firebase/firestore'
-import { useRecoilState, useSetRecoilState } from 'recoil'
+import { useSetRecoilState } from 'recoil'
 
 import { getAllCollectionDocs } from 'services/firebaseService/firebaseDBService'
 import useResetAtom from 'hooks/useResetAtom'
@@ -18,7 +18,7 @@ const ChooseChatters = () => {
   const [othersInfoDocList, setOthersInfoDocList] = useState<DocumentData[]>([])
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
   const setIsOpenChatRoom = useSetRecoilState(isOpenChatRoomAtom)
-  const [selectedChatters, setSelectedChatters] = useRecoilState(selectedChattersAtom)
+  const setSelectedChatters = useSetRecoilState(selectedChattersAtom)
   const { resetSelectedChatter, resetExistStoredChatRoom } = useResetAtom()
 
   useEffect(() => {

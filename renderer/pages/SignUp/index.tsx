@@ -17,12 +17,12 @@ const SignUp = () => {
     if (userAuthState) navigate.push('/UserList')
   }, [navigate, userAuthState])
 
-  const handleAuthSubmit = async (nickName: string, email: string, password: string) => {
+  const handleAuthSubmit = async (email: string, password: string, nickName: string) => {
     try {
       await signUpAuth(email, password).then((auth) => {
         createDocsWithSpecificId('userInfo', auth!.user.uid, { uid: auth!.user.uid, email, nickName })
       })
-      await updateNickName(nickName)
+      await updateNickName(nickName!)
     } catch (error) {
       if (error instanceof Error) {
         switch (error.message) {

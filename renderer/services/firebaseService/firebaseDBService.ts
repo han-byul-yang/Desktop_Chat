@@ -14,11 +14,10 @@ import {
   query,
   setDoc,
   updateDoc,
-  where,
 } from 'firebase/firestore'
 
-import { IUserInfo } from 'types/dbDocType'
 import { firebaseDBService } from './firebaseSetting'
+import { IUserInfoType } from 'types/dbDocType'
 
 export const createDocsWithAutoId = async (collectionName: string, data: any) => {
   return addDoc(collection(firebaseDBService, collectionName), data).catch((error) => {
@@ -26,8 +25,8 @@ export const createDocsWithAutoId = async (collectionName: string, data: any) =>
   })
 }
 
-export const createDocsWithSpecificId = async (collectionName: string, docId: string, data: any) => {
-  await setDoc(doc(firebaseDBService, collectionName, docId), data).catch((error) => {
+export const createDocsWithSpecificId = async (collectionName: string, docId: string, data: IUserInfoType) => {
+  return setDoc(doc(firebaseDBService, collectionName, docId), data).catch((error) => {
     if (error instanceof FirebaseError) throw Error()
   })
 }
@@ -53,30 +52,33 @@ export const getAllCollectionDocs = async (collectionName: string, condition?: Q
 }
 
 export const getSpecificDocs = async (collectionName: string, docId: string) => {
-  // const collectionQuery = query(collection(firebaseDBService, collectionName))
-  // const docs = await getDocs(collectionQuery)
   const docRef = doc(firebaseDBService, collectionName, docId)
   const docs = await getDoc(docRef)
 
   return docs
 }
 
-export const onSnapShotAllCollectionDocs = (collectionName: string, uid: string, handleFunc: Dispatch<any>) => {
-  // eslint-disable-next-line prettier/prettier
-  const q = query(collection(firebaseDBService, collectionName), where("member", "array-contains", uid))
+export const onSnapShotAllCollectionDocs = (
+  collectionName: string,
+  condition: QueryFieldFilterConstraint,
+  handleFunc: Dispatch<(DocumentData | undefined)[]>
+) => {
+  const q = query(collection(firebaseDBService, collectionName), condition)
   const unSubscribe = onSnapshot(q, (docData) => {
-    const myChatRoomsDocs: DocumentData[] = []
+    const docsList: DocumentData[] = []
 
-    docData.forEach((data) => myChatRoomsDocs.push(data.data()))
+    docData.forEach((data) => docsList.push(data.data()))
 
-    handleFunc(myChatRoomsDocs)
+    handleFunc(docsList)
   })
   return unSubscribe
 }
 
-// 공통 util로 만들기
-
-export const onSnapShotSpecificDocs = (collectionName: string, docId: string, handleFunc: Dispatch<any>) => {
+export const onSnapShotSpecificDocs = (
+  collectionName: string,
+  docId: string,
+  handleFunc: Dispatch<DocumentData | undefined>
+) => {
   const unSubscribe = onSnapshot(doc(firebaseDBService, collectionName, docId), (docData) => handleFunc(docData.data()))
 
   return unSubscribe

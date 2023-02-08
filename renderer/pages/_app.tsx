@@ -1,13 +1,11 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
+/* eslint-disable import/no-extraneous-dependencies */
 import { ReactElement, ReactNode, createContext, useState } from 'react'
-import type { AppProps } from 'next/app'
-import { RecoilRoot, useSetRecoilState } from 'recoil'
-// eslint-disable-next-line import/no-extraneous-dependencies
 import { NextPage } from 'next'
+import type { AppProps } from 'next/app'
+import { RecoilRoot } from 'recoil'
 import { getAuth } from 'firebase/auth'
 
 import { firebaseAuthService } from 'services/firebaseService/firebaseSetting'
-import Layout from 'components/Layout'
 import MainLayout from 'components/Layout/MainLayout'
 
 import '../styles/global.scss'
@@ -25,18 +23,16 @@ type AppPropsWithLayout = AppProps & {
 const App = ({ Component, pageProps }: AppPropsWithLayout) => {
   const auth = getAuth()
   const [isLogin, setIsLogin] = useState(!!auth.currentUser)
-  const [myUid, setMyUid] = useState('')
 
   const renderWithLayout =
     Component.getLayout ||
-    function (page) {
+    function specificLayout(page) {
       return <MainLayout>{page}</MainLayout>
     }
 
-  firebaseAuthService.onIdTokenChanged((state) => {
+  firebaseAuthService.onAuthStateChanged((state) => {
     if (state) {
       setIsLogin(true)
-      if (auth.currentUser) setMyUid(auth.currentUser.uid)
     } else {
       setIsLogin(false)
     }

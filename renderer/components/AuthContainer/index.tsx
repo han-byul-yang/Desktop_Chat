@@ -5,35 +5,39 @@ import { ErrorMessage } from '@hookform/error-message'
 
 import styles from './authContainer.module.scss'
 
-interface AuthProps {
+interface IAuthProps {
   type: string
   handleAuthSubmit: any
 }
 
-const AuthContainer = ({ type, handleAuthSubmit }: AuthProps) => {
+const AuthContainer = ({ type, handleAuthSubmit }: IAuthProps) => {
   const {
     register,
     formState: { errors },
     getValues,
     handleSubmit,
   } = useForm()
-  const { nickName, email, password, checkPassword } = getValues()
+  const { password, checkPassword } = getValues()
   const emailRegexp = /^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/ // w3c email validation
-  const onSubmit = type === 'signUp' ? handleAuthSubmit(nickName, email, password) : handleAuthSubmit(email, password)
+  const onSubmit = (data: any) => {
+    const { nickName, email, password: pw } = data
+    if (type === 'signUp') handleAuthSubmit(email, pw, nickName)
+    else handleAuthSubmit(email, pw)
+  }
 
   return (
     <div className={styles.authFormBox}>
       <p className={styles.helloMessage}>
         {type === 'signUp' ? '어서오세요. 처음뵙겠습니다:)' : '반갑습니다. 또 오셨군요:)'}
       </p>
-      <form className={styles.authForm} onSubmit={handleSubmit(() => onSubmit)}>
+      <form className={styles.authForm} onSubmit={handleSubmit(onSubmit)}>
         {type === 'signUp' && (
           <>
             <p>닉네임</p>
             <input
               {...register('nickName', {
                 required: '필수 입력 항목 입니다.',
-                maxLength: { value: 8, message: '최대 8자까지 작성할 수 있습니다.' },
+                maxLength: { value: 10, message: '최대 10자까지 작성할 수 있습니다.' },
               })}
             />
             <ErrorMessage className={styles.errorMessage} errors={errors} name='nickName' as='p' />

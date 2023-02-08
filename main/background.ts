@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
 import { app } from 'electron'
 import serve from 'electron-serve'
 import { createWindow } from './helpers'
@@ -14,7 +15,7 @@ if (isProd) {
   await app.whenReady()
 
   const mainWindow = createWindow('main', {
-    width: 700,
+    width: 2000,
     height: 1000,
   })
 

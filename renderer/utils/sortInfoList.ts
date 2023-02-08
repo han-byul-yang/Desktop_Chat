@@ -8,7 +8,6 @@ export const sortChattersByNickName = (list: { uid: string | undefined; nickName
     }
     return 0
   })
-
   return sortedChatters
 }
 

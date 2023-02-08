@@ -1,5 +1,4 @@
 import { DocumentData, arrayUnion } from 'firebase/firestore'
-import { IUserInfoType } from 'types/dbDocType'
 
 export const createChatRoomInfoData = (
   member: DocumentData[],

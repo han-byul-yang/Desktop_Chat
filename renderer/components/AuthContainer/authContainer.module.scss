@@ -56,4 +56,12 @@
   display: flex;
   justify-content: space-evenly;
   width: 100%;
+
+  a {
+    color: colors.$BLACK;
+
+    &:hover {
+      color: colors.$NEAR_WHITE;
+    }
+  }
 }

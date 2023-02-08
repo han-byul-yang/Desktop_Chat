@@ -1,7 +1,6 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ReactElement, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import fetch from 'isomorphic-unfetch'
 
 import { AuthStateContext } from 'pages/_app'
 import { signInAuth } from 'services/firebaseService/firebaseAuthService'
@@ -19,6 +18,7 @@ const SignIn = () => {
 
   const handleAuthSubmit = async (email: string, password: string) => {
     try {
+      // eslint-disable-next-line no-return-assign
       await signInAuth(email, password)
     } catch (error) {
       if (error instanceof Error) {

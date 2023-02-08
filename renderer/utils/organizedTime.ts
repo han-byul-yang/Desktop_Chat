@@ -57,3 +57,7 @@ export const firstDay = (millisecondes: string) => {
 
   return createDate.format(`YYYY년 MM월 DD일 ${day}요일`)
 }
+
+export const sameHourMinute = (millisecondes1: string, millisecondes2: string) => {
+  return dayNightTime(millisecondes1) === dayNightTime(millisecondes2)
+}

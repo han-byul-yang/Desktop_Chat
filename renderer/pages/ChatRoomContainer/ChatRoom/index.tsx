@@ -1,7 +1,7 @@
 /* eslint-disable consistent-return */
 /* eslint-disable import/no-extraneous-dependencies */
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
-import { DocumentData, arrayUnion, where } from 'firebase/firestore'
+import { DocumentData, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil'
 import cx from 'classnames'
@@ -15,7 +15,7 @@ import {
 } from 'services/firebaseService/firebaseDBService'
 import useResetAtom from 'hooks/useResetAtom'
 import { sortChattersByNickName } from 'utils/sortInfoList'
-import { newDayStart, firstDay, dayNightTime } from 'utils/organizedTime'
+import { newDayStart, firstDay, dayNightTime, sameHourMinute } from 'utils/organizedTime'
 import manageLineChange from 'utils/manageLineChange'
 import { createChatRoomInfoData, createMessageInfoData } from 'utils/InfoDataForStore'
 import makeChatRoomTitle from 'utils/makeChatRoomTitle'
@@ -37,13 +37,15 @@ const ChatRoom = () => {
     useResetAtom()
 
   const selectedChatterNickNames = selectedChatters.map((chatter) => chatter.nickName)
-  const allChatters = sortChattersByNickName([...selectedChatters, { uid, nickName: displayName }])
+  const allChatters = useMemo(
+    () => sortChattersByNickName([...selectedChatters, { uid, nickName: displayName }]),
+    [displayName, selectedChatters, uid]
+  )
 
   useEffect(() => {
     function getIfExistStoredChatRoom() {
       if (!existStoredChatRoom?.messageId) {
-        // eslint-disable-next-line prettier/prettier
-      const condition = where('member', "in", [[...allChatters]])
+        const condition = where('member', 'in', [[...allChatters]])
         getAllCollectionDocs('chatRoomInfo', condition).then((docData) => setExistStoredChatRoom(docData[0]))
       }
     }
@@ -90,8 +92,7 @@ const ChatRoom = () => {
   }
 
   useEffect(() => {
-    if (messageInfoDoc)
-      document.querySelector('#scroll')?.scrollIntoView({ behavior: 'smooth', block: 'end', inline: 'nearest' })
+    if (messageInfoDoc) document.querySelector('#scroll')?.scrollIntoView(false)
   }, [messageInfoDoc])
 
   const handleMessageSubmit = async (e?: FormEvent<HTMLFormElement>) => {
@@ -106,11 +107,13 @@ const ChatRoom = () => {
       const messageRef = await createDocsWithAutoId('messageInfo', messageInfoData)
       const chatRoomInfoData = createChatRoomInfoData(allChatters, time, messageRef?.id, '')
       const chatRoomRef = await createDocsWithAutoId('chatRoomInfo', chatRoomInfoData)
-      updateDocs('chatRoomInfo', chatRoomRef?.id, {
-        chatRoomId: chatRoomRef?.id,
-        lastMessage: { text: inputMessage, time },
-      })
-      getSpecificDocs('chatRoomInfo', chatRoomRef?.id).then((docData) => setExistStoredChatRoom(docData.data()))
+      chatRoomRef &&
+        updateDocs('chatRoomInfo', chatRoomRef?.id, {
+          chatRoomId: chatRoomRef?.id,
+          lastMessage: { text: inputMessage, time },
+        })
+      chatRoomRef &&
+        getSpecificDocs('chatRoomInfo', chatRoomRef?.id).then((docData) => setExistStoredChatRoom(docData.data()))
     }
   }
 
@@ -130,8 +133,10 @@ const ChatRoom = () => {
           } = message
           const messageInfoKey = `messageInfo-${index}`
           const isMyMessage = senderId === uid
-          const prevMessagInfo = messageInfoDoc?.messages[index - 1]
-          const newDay = !index ? firstDay(sentTime) : newDayStart(prevMessagInfo?.time, sentTime)
+          const prevMessageInfo = messageInfoDoc?.messages[index - 1]
+          const nextMessageInfo = messageInfoDoc?.messages[index + 1]
+          const newDay = !index ? firstDay(sentTime) : newDayStart(prevMessageInfo?.time, sentTime)
+          const sameNextTime = sameHourMinute(sentTime, nextMessageInfo?.time)
 
           return (
             <li key={messageInfoKey} className={styles.messageItem}>
@@ -141,19 +146,19 @@ const ChatRoom = () => {
                   [styles.myMessageBox]: isMyMessage,
                 })}
               >
-                {senderId !== prevMessagInfo?.sender.uid && <p className={styles.nickName}>{nickName}</p>}
+                {!isMyMessage && senderId !== prevMessageInfo?.sender.uid && (
+                  <p className={styles.nickName}>{nickName}</p>
+                )}
                 <div>
-                  {isMyMessage ? (
-                    <>
-                      <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>
-                      <p className={styles.myText}>{manageLineChange(text)}</p>
-                    </>
-                  ) : (
-                    <>
-                      <p className={styles.text}>{manageLineChange(text)}</p>
-                      <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>
-                    </>
-                  )}
+                  {isMyMessage && !sameNextTime && <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>}
+                  <p
+                    className={cx(styles.text, {
+                      [styles.myText]: isMyMessage,
+                    })}
+                  >
+                    {manageLineChange(text)}
+                  </p>
+                  {!isMyMessage && !sameNextTime && <p className={styles.sentTime}>{dayNightTime(sentTime)}</p>}
                 </div>
               </div>
             </li>

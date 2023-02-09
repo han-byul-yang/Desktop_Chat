@@ -22,3 +22,8 @@ export const isOpenChooseChattersAtom = atom({
   key: 'isOpenChooseChatters',
   default: false,
 })
+
+export const errorMessageAtom = atom({
+  key: 'errorMessage',
+  default: '',
+})

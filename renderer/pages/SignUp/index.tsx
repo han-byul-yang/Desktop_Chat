@@ -1,15 +1,18 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ReactElement, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useSetRecoilState } from 'recoil'
 
 import { AuthStateContext } from 'pages/_app'
 import { createDocsWithSpecificId } from 'services/firebaseService/firebaseDBService'
 import { signUpAuth, updateNickName } from 'services/firebaseService/firebaseAuthService'
+import { errorMessageAtom } from 'Store/docInfoAtom'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 import AuthLayout from 'components/Layout/AuthLayout'
 
 const SignUp = () => {
+  const setErrorMessage = useSetRecoilState(errorMessageAtom)
   const userAuthState = useContext(AuthStateContext)
   const navigate = useRouter()
 
@@ -27,10 +30,10 @@ const SignUp = () => {
       if (error instanceof Error) {
         switch (error.message) {
           case errorMessages['auth/email-already-in-use']:
-            console.log(error.message)
+            setErrorMessage(error.message)
             break
           case errorMessages['auth/weak-password']:
-            console.log(error.message)
+            setErrorMessage(error.message)
             break
         }
       }

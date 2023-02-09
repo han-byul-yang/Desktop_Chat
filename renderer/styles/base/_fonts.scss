@@ -1,18 +1,29 @@
+/* stylelint-disable import-notation */
 @use '../constants/colors';
 
-@import url('https://fonts.googleapis.com/css2?family=Do+Hyeon&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Gowun+Dodum&display=swap');
+@font-face {
+  font-family: BMDOHYEON;
+  font-style: normal;
+  font-weight: normal;
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_one@1.0/BMDOHYEON.woff') format('woff');
+}
+@font-face {
+  font-family: GowunDodum-Regular;
+  font-style: normal;
+  font-weight: normal;
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/noonfonts_2108@1.1/GowunDodum-Regular.woff') format('woff');
+}
 
 body,
 button {
-  font-family: 'Gowun Dodum', sans-serif;
+  font-family: GowunDodum-Regular, sans-serif;
   font-feature-settings: 'tnum';
   color: colors.$FONT;
 }
 
 input,
 textarea {
-  font-family: 'Do Hyeon', serif;
+  font-family: BMDOHYEON, serif;
   font-feature-settings: 'tnum';
   color: colors.$FONT;
 }
@@ -20,7 +31,7 @@ textarea {
 input[type='search'],
 input[type='email'],
 input[type='password'] {
-  font-family: 'Gowun Dodum', sans-serif;
+  font-family: GowunDodum-Regular, sans-serif;
 }
 
 input[type='number'] {

@@ -1,14 +1,17 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { ReactElement, useContext, useEffect } from 'react'
 import { useRouter } from 'next/router'
+import { useSetRecoilState } from 'recoil'
 
 import { AuthStateContext } from 'pages/_app'
 import { signInAuth } from 'services/firebaseService/firebaseAuthService'
+import { errorMessageAtom } from 'Store/docInfoAtom'
 import { errorMessages } from 'constants/errorMessages'
 import AuthContainer from 'components/AuthContainer'
 import AuthLayout from 'components/Layout/AuthLayout'
 
 const SignIn = () => {
+  const setErrorMessage = useSetRecoilState(errorMessageAtom)
   const userAuthState = useContext(AuthStateContext)
   const navigate = useRouter()
 
@@ -24,16 +27,16 @@ const SignIn = () => {
       if (error instanceof Error) {
         switch (error.message) {
           case errorMessages['auth/email-already-in-use']:
-            console.log(error.message)
+            setErrorMessage(error.message)
             break
           case errorMessages['auth/user-not-found']:
-            console.log(error.message)
+            setErrorMessage(error.message)
             break
           case errorMessages['auth/wrong-password']:
-            console.log(error.message)
+            setErrorMessage(error.message)
             break
           default:
-            console.log(errorMessages['auth/something-went-wrong'])
+            setErrorMessage(errorMessages['auth/something-went-wrong'])
         }
       }
     }

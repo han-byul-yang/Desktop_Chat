@@ -59,5 +59,11 @@ export const firstDay = (millisecondes: string) => {
 }
 
 export const sameHourMinute = (millisecondes1: string, millisecondes2: string) => {
+  const nowDate = dayjs()
+  const nowDateFormat = dayjs(nowDate.format(), 'YYYY-MM-DDTHH:mm:ss+SSS')
+
+  if (dateFormat(millisecondes2).unix() === nowDateFormat.unix()) {
+    return false
+  }
   return dayNightTime(millisecondes1) === dayNightTime(millisecondes2)
 }

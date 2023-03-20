@@ -1,0 +1,46 @@
+@use '../../../styles/constants/colors';
+
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 30%);
+}
+
+.modalBox {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-around;
+  width: 300px;
+  height: 200px;
+  padding: 10px 20px;
+  font-size: 13px;
+  background: colors.$NEAR_WHITE;
+  border-radius: 8px;
+  transform: translate(-50%, -50%);
+
+  p {
+    font-size: 20px;
+
+    &:first-child {
+      font-size: 24px;
+    }
+  }
+
+  .xIcon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+  }
+}

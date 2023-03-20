@@ -22,17 +22,9 @@
 </pre>
 
 ## 2. 사용 기술
-- Front-End
   - React v18
-  - Nextron(Next+Electron)
   - Typescript
-- Back-End
   - Firebase
-  - Nodejs
-- Management Tool
-  - Git
-  - Github
-  - Visual Studio Code
 
 ## 3. 기능 구현
 - [x] 로그인

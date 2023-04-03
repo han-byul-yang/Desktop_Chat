@@ -2,7 +2,7 @@
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from 'react'
 import { DocumentData, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
-import { useSetRecoilState, useRecoilValue, useRecoilState } from 'recoil'
+import { useRecoilValue, useRecoilState } from 'recoil'
 import cx from 'classnames'
 
 import {
@@ -68,7 +68,6 @@ const ChatRoom = () => {
 
   useEffect(() => {
     return () => {
-      // resetIsOpenChatRoom()
       resetIsOpenChooseChatters()
       resetSelectedChatter()
       resetExistStoredChatRoom()

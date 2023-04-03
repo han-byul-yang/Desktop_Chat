@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { NavLink, useNavigate } from 'react-router-dom'
 import cx from 'classnames'
 

@@ -1,11 +1,9 @@
-import { useContext, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { DocumentData, where } from 'firebase/firestore'
 import { getAuth } from 'firebase/auth'
 import { useRecoilState, useSetRecoilState } from 'recoil'
 import cx from 'classnames'
 
-// import { AuthStateContext } from 'pages/_app'
 import useResetAtom from 'hooks/useResetAtom'
 import { onSnapShotAllCollectionDocs } from 'service/firebaseService/firebaseDBService'
 import { sortChatRoomsByTime } from 'utils/sortInfoList'
@@ -26,12 +24,6 @@ const ChatRooms = () => {
   const [isOpenChatRoom, setIsOpenChatRoom] = useRecoilState(isOpenChatRoomAtom)
   const setIsOpenChooseChatters = useSetRecoilState(isOpenChooseChattersAtom)
   const { resetSelectedChatter } = useResetAtom()
-  // const userAuthState = useContext(AuthStateContext)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    // if (!userAuthState) navigate('/signIn')
-  }, [navigate])
 
   useEffect(() => {
     let unsubscribe
@@ -100,5 +92,3 @@ const ChatRooms = () => {
 }
 
 export default ChatRooms
-
-// organizedTime useMemo 사용 여부

@@ -1,9 +1,7 @@
-import { useContext, useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
 import { getAuth } from 'firebase/auth'
 import { DocumentData } from 'firebase/firestore'
 
-// import { AuthStateContext } from 'pages/_app'
 import { getAllCollectionDocs } from 'service/firebaseService/firebaseDBService'
 import Header from 'components/Header'
 import ProfileBox from 'components/ProfileBox'
@@ -17,12 +15,6 @@ const UserList = () => {
   const myUid = getAuth().currentUser?.uid
   const myInfoDoc = useRef<DocumentData>({})
   const othersInfoDoc = useRef<DocumentData[]>([])
-  // const userAuthState = useContext(AuthStateContext)
-  const navigate = useNavigate()
-
-  useEffect(() => {
-    // if (!userAuthState) navigate('/signIn')
-  }, [navigate])
 
   useEffect(() => {
     getAllCollectionDocs('userInfo').then((docData) => {
